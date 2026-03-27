@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>世界の大富豪 九州編</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@700;900&display=swap');
+:root {
+  --gold:#c9820a; --gold2:#e8a020; --gold3:#f5c842; --gold-light:#fde98a; --gold-pale:#fff8e1;
+  --bg:#fffdf5; --bg2:#fff9e6; --bg3:#fef3c7; --white:#ffffff;
+  --dark:#1a1200; --dark2:#3d2e00;
+  --text:#2a1f00; --text2:#6b4f00; --text3:#9a7a20;
+  --green:#2e7d32; --red:#c62828; --border:#e8c84a; --shadow:rgba(201,130,10,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;}
+
+/* タイトル */
+#title-screen{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#fffbe6 0%,#fde98a 50%,#f5c842 100%);
+  position:relative;overflow:hidden;text-align:center;padding:2rem;
+}
+.coin-rain{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.coin-drop{position:absolute;border-radius:50%;animation:coinFall linear infinite;opacity:0;}
+.coin-drop.big{width:22px;height:22px;background:radial-gradient(circle at 30% 28%,#fffde0,#ffe44d 30%,#f5c518 55%,#d4a017 80%,#b8860b 100%);box-shadow:0 0 14px 4px rgba(255,220,0,0.85),0 0 30px 6px rgba(255,200,0,0.35);}
+.coin-drop.med{width:16px;height:16px;background:radial-gradient(circle at 32% 28%,#fffbe0,#ffd700 35%,#f0b800 60%,#c8980a 90%);box-shadow:0 0 10px 3px rgba(255,215,0,0.8),0 0 20px 4px rgba(255,180,0,0.3);}
+.coin-drop.small{width:10px;height:10px;background:radial-gradient(circle at 30% 28%,#fffcd0,#ffd700 40%,#e8a800 70%,#c08800 100%);box-shadow:0 0 8px 3px rgba(255,210,0,0.75);}
+.coin-drop::after{content:'';position:absolute;top:16%;left:16%;width:32%;height:32%;border-radius:50%;background:rgba(255,255,220,0.85);filter:blur(1px);}
+.coin-drop.sparkle::before{content:'✦';position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffe44d;text-shadow:0 0 6px #fff,0 0 12px #ffd700;animation:sparklePop 0.6s ease-out infinite alternate;}
+@keyframes sparklePop{0%{opacity:0.3;transform:translateX(-50%) scale(0.7);}100%{opacity:1;transform:translateX(-50%) scale(1.2);}}
+@keyframes coinFall{0%{transform:translateY(-60px) rotateY(0deg) scale(0.7);opacity:0;}6%{opacity:1;}50%{transform:translateY(52vh) rotateY(200deg) scale(1.05);}93%{opacity:1;}100%{transform:translateY(108vh) rotateY(400deg) scale(0.8);opacity:0;}}
+
+.title-episode{position:relative;font-size:0.8rem;letter-spacing:0.5em;color:var(--dark2);margin-bottom:0.5rem;font-weight:700;}
+.title-main{position:relative;font-family:'Zen Kaku Gothic New','Noto Sans JP',sans-serif;font-size:clamp(2.8rem,10vw,5.5rem);font-weight:900;color:var(--dark);text-shadow:3px 3px 0 rgba(201,130,10,0.3);}
+.title-badge{position:relative;display:inline-block;background:linear-gradient(135deg,var(--dark),var(--dark2));color:var(--gold3);font-size:1rem;font-weight:900;padding:0.4rem 1.5rem;border-radius:30px;letter-spacing:0.2em;margin-top:0.7rem;border:2px solid var(--gold3);}
+.title-sub{position:relative;font-size:0.9rem;color:var(--dark2);margin-top:1rem;letter-spacing:0.15em;font-weight:700;}
+.title-series{position:relative;font-size:0.78rem;color:var(--text2);margin-top:0.5rem;}
+.start-btn{position:relative;margin-top:2.5rem;padding:1rem 3rem;background:linear-gradient(135deg,var(--dark),var(--dark2));color:var(--gold3);font-size:1.2rem;font-weight:900;font-family:'Noto Sans JP',sans-serif;border:2px solid var(--gold3);border-radius:50px;cursor:pointer;letter-spacing:0.12em;box-shadow:0 4px 20px rgba(0,0,0,0.2),0 0 30px rgba(245,200,66,0.3);transition:all 0.2s;}
+.start-btn:hover{transform:scale(1.04);}
+.save-info{position:relative;margin-top:0.8rem;font-size:0.78rem;color:var(--dark2);}
+
+/* ゲーム画面 */
+#game-screen{display:none;}
+.header{background:linear-gradient(135deg,var(--dark),var(--dark2));padding:0.7rem 1.2rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold3);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.2);}
+.header-title{font-family:'Zen Kaku Gothic New',sans-serif;font-size:1.1rem;font-weight:900;color:var(--gold3);}
+.asset-display{text-align:right;}
+.asset-label{font-size:0.65rem;color:var(--gold-light);letter-spacing:0.1em;}
+.asset-amount{font-family:'Zen Kaku Gothic New',sans-serif;font-size:1.5rem;font-weight:900;color:var(--gold3);text-shadow:0 0 15px rgba(245,200,66,0.6);}
+
+.stage-bar{background:var(--bg2);border-bottom:2px solid var(--border);padding:0.6rem 1rem;display:flex;gap:0.4rem;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.stage-bar::-webkit-scrollbar{height:3px;}
+.stage-bar::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:3px;}
+.stage-btn{flex:0 0 auto;padding:0.4rem 0.9rem;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--text2);font-size:0.82rem;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.stage-btn:hover{background:var(--gold-pale);border-color:var(--gold2);}
+.stage-btn.active{background:linear-gradient(135deg,var(--dark),var(--dark2));color:var(--gold3);border-color:var(--gold3);}
+.stage-btn.cleared{background:var(--gold3);color:var(--dark);border-color:var(--gold2);}
+.stage-btn.locked{opacity:0.4;cursor:not-allowed;}
+
+.main-content{padding:1rem;max-width:680px;margin:0 auto;}
+
+.stage-header{background:linear-gradient(135deg,var(--dark),var(--dark2));border-radius:16px;padding:1rem 1.2rem;margin-bottom:1rem;color:var(--gold3);border:2px solid var(--gold3);box-shadow:0 4px 16px var(--shadow);}
+.stage-header h2{font-size:1.2rem;font-weight:900;}
+.stage-header-sub{font-size:0.78rem;color:var(--gold-light);margin-top:0.2rem;}
+.progress-wrap{margin-top:0.7rem;}
+.progress-bar-bg{background:rgba(255,255,255,0.15);border-radius:10px;height:8px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold-light));border-radius:10px;transition:width 0.5s;}
+.progress-text{font-size:0.72rem;color:var(--gold-light);margin-top:0.3rem;}
+
+.q-card{background:var(--white);border:2px solid var(--border);border-radius:16px;padding:1.3rem;box-shadow:0 4px 16px var(--shadow);margin-bottom:1rem;}
+.q-num{font-size:0.7rem;font-weight:900;color:var(--text3);letter-spacing:0.1em;margin-bottom:0.5rem;}
+.q-text{font-size:1rem;font-weight:700;line-height:1.7;color:var(--text);margin-bottom:1rem;}
+.map-hint-box{background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:0.7rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:var(--dark2);}
+.map-hint-box .hint-label{font-weight:900;color:var(--gold);margin-bottom:0.3rem;}
+
+.choices{display:flex;flex-direction:column;gap:0.5rem;}
+.choice-btn{padding:0.8rem 1rem;background:var(--bg);border:2px solid var(--border);border-radius:12px;color:var(--text);cursor:pointer;font-size:0.95rem;font-weight:700;font-family:'Noto Sans JP',sans-serif;text-align:left;transition:all 0.15s;display:flex;align-items:center;gap:0.6rem;}
+.choice-btn:hover:not(:disabled){border-color:var(--gold2);background:var(--gold-pale);}
+.choice-btn.correct{border-color:var(--green);background:#e8f5e9;color:var(--green);}
+.choice-btn.wrong{border-color:var(--red);background:#ffebee;color:var(--red);}
+.choice-btn:disabled{cursor:not-allowed;}
+.choice-label{width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--dark);font-size:0.75rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.choice-btn.correct .choice-label{background:var(--green);color:#fff;}
+.choice-btn.wrong .choice-label{background:var(--red);color:#fff;}
+
+.explanation{display:none;margin-top:0.8rem;padding:0.9rem 1rem;border-radius:10px;font-size:0.88rem;line-height:1.6;font-weight:700;}
+.explanation.correct-exp{background:#e8f5e9;border:1.5px solid var(--green);color:var(--green);}
+.explanation.wrong-exp{background:#fff3e0;border:1.5px solid #f57c00;color:#e65100;}
+
+.next-q-btn{margin-top:1rem;width:100%;padding:0.8rem;background:linear-gradient(135deg,var(--dark),var(--dark2));color:var(--gold3);border:2px solid var(--gold3);border-radius:12px;font-size:1rem;font-weight:900;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:none;transition:all 0.2s;}
+
+.coin-pop{position:fixed;pointer-events:none;z-index:9999;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff9c4,#f5c842 45%,#b8860b 85%);box-shadow:0 0 8px rgba(245,200,66,0.9);animation:coinPop 1s ease-out forwards;}
+@keyframes coinPop{0%{transform:translateY(0) scale(0.5);opacity:1;}100%{transform:translateY(-70px) scale(1.3);opacity:0;}}
+
+.stage-clear-card{background:linear-gradient(135deg,var(--dark),var(--dark2));border:3px solid var(--gold3);border-radius:20px;padding:2rem;text-align:center;color:var(--gold3);box-shadow:0 8px 32px var(--shadow);}
+.stage-clear-card h2{font-size:1.8rem;font-weight:900;text-shadow:0 0 20px rgba(245,200,66,0.5);}
+.bonus-num{font-family:'Zen Kaku Gothic New',sans-serif;font-size:2.5rem;font-weight:900;color:var(--gold3);animation:popIn 0.5s ease-out;}
+@keyframes popIn{0%{transform:scale(0.4);opacity:0;}70%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
+.property-list{display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;margin:1rem 0;}
+.prop-badge{padding:0.35rem 0.8rem;background:rgba(245,200,66,0.15);border:1px solid var(--gold3);border-radius:20px;font-size:0.78rem;color:var(--gold3);}
+.next-stage-btn{margin-top:1.5rem;padding:0.9rem 2.5rem;background:linear-gradient(135deg,var(--gold3),var(--gold2));color:var(--dark);font-size:1.1rem;font-weight:900;font-family:'Noto Sans JP',sans-serif;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 16px rgba(201,130,10,0.3);transition:all 0.2s;}
+.next-stage-btn:hover{transform:scale(1.05);}
+.score-display{background:rgba(255,255,255,0.08);border:1px solid rgba(245,200,66,0.3);border-radius:12px;padding:0.7rem 1rem;margin-top:0.8rem;display:flex;gap:1.5rem;justify-content:center;}
+.score-item{text-align:center;}
+.score-label{font-size:0.68rem;color:var(--gold-light);}
+.score-val{font-size:1.1rem;font-weight:900;color:var(--gold3);}
+.difficulty-badge{display:inline-block;padding:0.2rem 0.7rem;border-radius:10px;font-size:0.72rem;font-weight:900;margin-bottom:0.5rem;}
+.diff-1{background:rgba(46,125,50,0.2);color:#4caf50;border:1px solid #4caf50;}
+.diff-2{background:rgba(245,127,23,0.2);color:#ff9800;border:1px solid #ff9800;}
+.diff-3{background:rgba(198,40,40,0.2);color:#ef5350;border:1px solid #ef5350;}
+</style>
+</head>
+<body>
+
+<div id="title-screen">
+  <div class="coin-rain" id="coinRain"></div>
+  <div class="title-episode">EPISODE 1 - 九州地方</div>
+  <div class="title-main">世界の大富豪</div>
+  <div class="title-badge">🌋 九州編</div>
+  <div class="title-sub">5ステージ・75問で九州を完全制覇！</div>
+  <div class="title-series">📚 シリーズ：九州 / 中国四国 / 近畿 / 中部 / 関東 / 東北 / 北海道</div>
+  <button class="start-btn" id="startBtn">🏆 プレイ開始</button>
+  <div class="save-info" id="saveInfo"></div>
+</div>
+
+<div id="game-screen">
+  <div class="header">
+    <div class="header-title">🌋 九州編</div>
+    <div class="asset-display">
+      <div class="asset-label">総資産</div>
+      <div class="asset-amount" id="assetDisplay">0円</div>
+    </div>
+  </div>
+  <div class="stage-bar" id="stageBar"></div>
+  <div class="main-content">
+    <div id="mainContent">
+      <div style="text-align:center;padding:3rem 1rem;color:var(--text3);">
+        <div style="font-size:3rem;margin-bottom:1rem;">👆</div>
+        <div>上のボタンからステージを選ぼう！</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// 問題データ：九州地方（教科書目次準拠・5ステージ×15問）
+// =====================================================
+const STAGES = [
+{
+  id:0,
+  name:'① 九州の自然環境',
+  icon:'🗺️',
+  difficulty:1,
+  bonus:300000000,
+  properties:['阿蘇山観光地','桜島展望台','霧島温泉','有明海干拓地'],
+  theme:'九州の地形・気候・自然の特徴を学ぼう',
+  questions:[
+    {q:'九州地方で最も面積が大きい平野は？',
+     c:['筑紫平野','宮崎平野','熊本平野','大隅平野'],a:0,
+     exp:'筑紫平野は福岡県・佐賀県にまたがる九州最大の平野。稲作が盛んで、クリークと呼ばれる水路網が発達している。'},
+    {q:'熊本県にある、世界最大級のカルデラを持つ火山は？',
+     c:['桜島','雲仙岳','阿蘇山','霧島山'],a:2,
+     exp:'阿蘇山のカルデラは東西約18km・南北約25kmで世界最大級。カルデラ内に集落や農地が広がる珍しい地形。'},
+    {q:'カルデラとはどのような地形？',
+     c:['川が運んだ土が積もった平野','火山の噴火・陥没でできた大きなくぼ地','波に削られた海岸','断層でできた盆地'],a:1,
+     exp:'カルデラは火山の大噴火後に地盤が陥没してできたくぼ地。鹿児島湾（錦江湾）もカルデラに海水が入ったもの。'},
+    {q:'鹿児島湾（錦江湾）はどのようにしてできた地形？',
+     c:['川の侵食でできた湾','カルデラに海水が入り込んでできた','サンゴ礁がつくった','断層運動でできた'],a:1,
+     exp:'鹿児島湾はカルデラに海水が浸入してできた。湾内には桜島があり、現在も活発に噴火を続けている。'},
+    {q:'鹿児島県に位置する、現在も活発に噴火を続けている火山は？',
+     c:['雲仙岳','阿蘇山','霧島山','桜島'],a:3,
+     exp:'桜島は鹿児島湾内にある活火山。年間1000回以上噴火することもあり、鹿児島市内に降灰をもたらすことが多い。'},
+    {q:'九州南部の鹿児島県に広がる、火山灰が積もった台地を何という？',
+     c:['関東ローム','シラス台地','讃岐平野','北上高地'],a:1,
+     exp:'シラス台地は火山噴出物（軽石・火山灰）が積もった台地。水はけがよく稲作には不向きで、畑作・畜産が中心。'},
+    {q:'シラス台地が稲作に不向きな理由は？',
+     c:['気温が低すぎるから','水はけがよすぎて水田に水がたまらないから','土地が急傾斜だから','塩分が多いから'],a:1,
+     exp:'シラスは軽石質で水はけが非常によい。水田には一定の保水力が必要なため、シラス台地では稲作が難しい。'},
+    {q:'九州地方の太平洋側（宮崎県など）の気候の特徴は？',
+     c:['年中冷涼で雨が少ない','夏に台風・季節風の影響で降水量が多い','冬に雪が非常に多い','年中乾燥している'],a:1,
+     exp:'宮崎県など九州南東部は黒潮（暖流）と夏の季節風の影響で年間降水量が非常に多い。台風の通り道でもある。'},
+    {q:'九州西部（長崎県・佐賀県）の海岸線の特徴は？',
+     c:['砂浜が続くなだらかな海岸','リアス海岸で複雑に入り組んでいる','断崖絶壁の海岸','干拓が進んでいる'],a:1,
+     exp:'長崎県・佐賀県の海岸はリアス海岸が発達。入り組んだ地形は波が穏やかで漁業・養殖に適している。'},
+    {q:'有明海の特徴として正しいのは？',
+     c:['外洋に面した深い海','干満の差が大きく干拓が行われた内湾','山に囲まれた湖','外国と接する国境の海'],a:1,
+     exp:'有明海は日本最大の干満差（最大約6m）を誇る内湾。古くから干拓が行われ農地が造成されてきた。のりの養殖も盛ん。'},
+    {q:'九州北部（福岡県など）の気候の特徴は？',
+     c:['年中温暖で台風が多い','冬に大陸からの季節風の影響を受けやすい','年中乾燥している','梅雨がない'],a:1,
+     exp:'九州北部は冬に大陸から吹く北西の季節風の影響で曇りや雨の日が多い。日本海側気候の特徴を持つ。'},
+    {q:'九州地方に多い温泉の分布と関係が深いのは？',
+     c:['海流の影響','火山活動が活発なため','降水量が多いため','地形が平らなため'],a:1,
+     exp:'九州は火山が多く、地下深部のマグマで熱せられた地下水が温泉として湧出する。大分県の別府・由布院が有名。'},
+    {q:'大分県が全国1位を誇るのは？',
+     c:['りんごの生産量','米の生産量','温泉の源泉数','漁獲量'],a:2,
+     exp:'大分県は別府・由布院など温泉地が集中し、温泉源泉数・湧出量ともに全国1位。火山県ならではの資源。'},
+    {q:'九州地方を流れる川の特徴として正しいのは？',
+     c:['長く流れが穏やか','山地が多いため短く急流が多い','砂漠を流れる川が多い','全て東に流れる'],a:1,
+     exp:'九州は山地が多く川が短くて急流。筑後川（筑紫平野）が最大の川。急流は水力発電にも利用されてきた。'},
+    {q:'【地図】阿蘇山（世界最大級のカルデラ）がある熊本県は九州のどこに位置する？',
+     c:['九州の最北部','九州の中央部','九州の最南部','九州の西端'],a:1,
+     mapHint:'福岡県の南・大分県の西・宮崎県の北西に接する内陸寄りの県',
+     exp:'熊本県は九州の中央部に位置する。阿蘇山は熊本県東部にあり、カルデラの中に多くの人が暮らしている。'},
+  ]
+},
+{
+  id:1,
+  name:'② 火山と人々の生活',
+  icon:'🌋',
+  difficulty:1,
+  bonus:400000000,
+  properties:['地熱発電所（八丁原）','温泉旅館（別府）','桜島農園','火山観光施設'],
+  theme:'火山がもたらす恵みと災害、人々との関わりを学ぼう',
+  questions:[
+    {q:'大分県八丁原にある、火山エネルギーを利用した発電所の種類は？',
+     c:['水力発電','火力発電','地熱発電','原子力発電'],a:2,
+     exp:'地熱発電は火山地帯の地下熱を利用して蒸気をつくり発電する。八丁原は日本最大級の地熱発電所。'},
+    {q:'地熱発電のメリットとして正しいのは？',
+     c:['燃料費が高い','CO₂をほとんど排出しない再生可能エネルギー','天気に左右される','夜間は発電できない'],a:1,
+     exp:'地熱発電は地球の熱エネルギーを利用するため燃料不要・CO₂排出がほぼゼロ。天候に左右されず安定して発電できる。'},
+    {q:'桜島の火山灰が農業に与えている影響として正しいのは？',
+     c:['農業がまったくできない','日照不足で困っている','降灰による農作物への被害がある','土地が肥えて豊作になる'],a:2,
+     exp:'桜島の噴火による降灰は農作物（特にお茶や野菜）に被害をもたらす。農家はビニールハウスなどで対策している。'},
+    {q:'火山の噴火が人々の生活にもたらす「恵み」として正しいのは？',
+     c:['温泉・地熱発電・観光資源','塩分を含む土地になる','海面が上昇する','気温が上がる'],a:0,
+     exp:'火山は噴火の危険がある一方、温泉・地熱発電・火山観光・肥沃な土壌など多くの恵みももたらす。'},
+    {q:'1990年代に大規模な噴火が起きた長崎県の火山は？',
+     c:['阿蘇山','桜島','雲仙岳（普賢岳）','霧島山'],a:2,
+     exp:'雲仙普賢岳は1991年に大規模噴火。火砕流が発生し、取材中のジャーナリストや住民など43人が犠牲になった。'},
+    {q:'火砕流とはどのような現象？',
+     c:['溶岩が川のように流れる現象','高温のガス・岩石・火山灰が高速で斜面を流れる現象','地震で地面が液体状になる現象','津波が山を越える現象'],a:1,
+     exp:'火砕流は高温（数百℃）のガスと砕けた岩石・火山灰が混ざり、高速（時速100km以上）で斜面を流れ下る現象。'},
+    {q:'火山の多い九州で「火山との共生」のために行われていることは？',
+     c:['火山をすべて爆破して消す','噴火予測・避難訓練・ハザードマップの整備','火山の近くに住まない政策','観光を禁止する'],a:1,
+     exp:'九州では火山観測・噴火予測システムの整備や、住民への避難訓練・ハザードマップ作成など防災対策が進んでいる。'},
+    {q:'温泉を観光資源として活用している大分県の都市は？',
+     c:['長崎市','熊本市','別府市・由布市','鹿児島市'],a:2,
+     exp:'別府市は8つの温泉地（別府八湯）を持つ日本最大の温泉地。由布市の由布院温泉とともに全国から観光客が訪れる。'},
+    {q:'火山灰土（シラス）が堆積した台地で行われている農業として正しいのは？',
+     c:['水田稲作','大規模な小麦栽培','畑作・畜産（肉牛・豚）','りんご栽培'],a:2,
+     exp:'シラス台地は水はけがよく稲作に不向きだが、畑作（さつまいも・お茶）や畜産（肉牛・豚）に活用されている。'},
+    {q:'九州の火山が多い理由は？',
+     c:['偶然そうなった','プレート（地殻）の境界に位置するため','海流の影響','気候が温暖だから'],a:1,
+     exp:'九州はユーラシアプレート・フィリピン海プレートなどの境界に位置する。プレートの沈み込みで生じるマグマが火山をつくる。'},
+    {q:'火山活動が活発な地域でよく見られる「地熱」を利用したものとして誤っているのは？',
+     c:['温泉','地熱発電','地熱を使った暖房','核融合発電'],a:3,
+     exp:'核融合発電は火山・地熱とは無関係の技術。温泉・地熱発電・地熱暖房は全て地下の熱エネルギーを利用したもの。'},
+    {q:'桜島を抱える鹿児島市が行っている防災対策として正しいのは？',
+     c:['桜島への立ち入りを完全禁止','定期的な避難訓練や降灰対策（側溝清掃など）','全市民を移転させた','火山を冷やすため水を注入している'],a:1,
+     exp:'鹿児島市は桜島の噴火と共に生きる都市。定期避難訓練・防災教育・降灰による側溝詰まりへの対策などを日常的に実施。'},
+    {q:'九州の火山地帯に多い「カルデラ湖」とは？',
+     c:['川がせき止められてできた湖','カルデラのくぼ地に水がたまってできた湖','人工的に作られたダム湖','海水が入り込んだ湖'],a:1,
+     exp:'カルデラ湖はカルデラのくぼ地に雨水・地下水がたまってできた湖。熊本県の池山水源などが例として挙げられる。'},
+    {q:'温泉が湧き出る仕組みとして正しいのは？',
+     c:['川の水が温められた','地下のマグマや熱源で温められた地下水が地表に出てくる','海水が蒸発して地下に入った','太陽の熱が岩盤を温めた'],a:1,
+     exp:'地下深部のマグマの熱で温められた地下水が、地殻の割れ目を通って地表に湧き出たものが温泉。成分も様々。'},
+    {q:'【地図】地熱発電所がある「八丁原」が位置する大分県は九州のどこ？',
+     c:['九州の北西部','九州の北東部（日本海・瀬戸内海側）','九州の南端','九州の西端'],a:1,
+     mapHint:'福岡県の東・愛媛県（四国）と向き合う、別府温泉で有名な県',
+     exp:'大分県は九州北東部に位置し、別府湾に面する。温泉・地熱資源が豊富で、地熱発電の先進地でもある。'},
+  ]
+},
+{
+  id:2,
+  name:'③ 九州の農業',
+  icon:'🌾',
+  difficulty:2,
+  bonus:500000000,
+  properties:['促成栽培ハウス（宮崎）','畜産農場（鹿児島）','筑紫平野の水田','さつまいも農園'],
+  theme:'九州の農業の特色・種類・地域差を学ぼう',
+  questions:[
+    {q:'宮崎県で行われる、温暖な気候を利用して出荷時期を早める栽培方法は？',
+     c:['抑制栽培','有機農業','促成栽培','露地栽培'],a:2,
+     exp:'促成栽培は温室・ビニールハウスで作物を早く育て、他産地より早く出荷する方法。宮崎のピーマン・きゅうりが有名。'},
+    {q:'促成栽培が宮崎県でさかんな理由は？',
+     c:['土地が広いから','黒潮（暖流）の影響で冬も温暖だから','降水量が少ないから','平野が多いから'],a:1,
+     exp:'宮崎県は黒潮（暖流）の影響で冬も温暖。この気候を利用して他産地より早く野菜を出荷し高値で売れる促成栽培が盛ん。'},
+    {q:'鹿児島県・宮崎県で全国トップクラスの生産を誇る畜産物は？',
+     c:['乳牛・牛乳','肉牛・豚','羊・ウール','馬'],a:1,
+     exp:'鹿児島・宮崎は肉牛（黒毛和牛）・豚の飼育頭数が全国1位・2位を競う。広大なシラス台地が畜産に活用されている。'},
+    {q:'シラス台地で畜産が発達した理由として正しいのは？',
+     c:['水が豊富で牛が飲める','水はけのよい台地が牧草栽培に向くから','気温が低く保存に適するから','輸出に便利な港が近いから'],a:1,
+     exp:'シラス台地は稲作に不向きだが、草が育ちやすく広大な牧草地として活用できる。温暖な気候も畜産に適している。'},
+    {q:'九州最大の平野「筑紫平野」でさかんな農業は？',
+     c:['促成栽培','稲作（米の生産）','酪農','果樹栽培'],a:1,
+     exp:'筑紫平野（福岡・佐賀）はクリーク（水路網）が整備された九州最大の稲作地帯。ひのひかりなどのブランド米が生産される。'},
+    {q:'筑紫平野に見られる「クリーク」とは何？',
+     c:['防風林','農業用水路（水田に水を引くための網目状の水路）','用水池','農道'],a:1,
+     exp:'クリークは稲作に必要な水を確保するために掘られた水路。佐賀平野に特に多く、水田の間に網目状に張り巡らされている。'},
+    {q:'鹿児島県の特産品「さつまいも」が多く生産される理由は？',
+     c:['水はけのよいシラス台地がさつまいも栽培に適しているから','寒冷な気候が向いているから','降水量が多いから','輸出のために作っているから'],a:0,
+     exp:'さつまいもは水はけのよい砂質土壌を好む。シラス台地の性質がさつまいも栽培に最適で、鹿児島は全国1位の生産量。'},
+    {q:'宮崎県の日向灘沿岸でさかんな農業として正しいのは？',
+     c:['稲作のみ','ビニールハウスを使った野菜・花の促成栽培','りんご栽培','酪農'],a:1,
+     exp:'日向灘沿岸は温暖な気候とビニールハウスを活用した促成栽培が盛ん。ピーマン・きゅうり・完熟マンゴーなどが有名。'},
+    {q:'長崎県・熊本県の海岸部でさかんな農業・水産業は？',
+     c:['大規模畑作','リアス海岸を利用した漁業・養殖業','平野の稲作','工業農業'],a:1,
+     exp:'長崎県・熊本県はリアス海岸が多く漁業が盛ん。真珠・カキ・真鯛などの養殖も発達している。'},
+    {q:'九州でお茶の生産がさかんな県は？',
+     c:['福岡県','鹿児島県・宮崎県','大分県','長崎県'],a:1,
+     exp:'鹿児島県は静岡県と並ぶ茶の主要産地。温暖な気候と火山灰土が茶の栽培に適している。知覧茶が有名。'},
+    {q:'有明海でさかんに養殖されている水産物は？',
+     c:['まぐろ','のり（海苔）','うなぎ','さけ'],a:1,
+     exp:'有明海は干満の差が大きく栄養分が豊富。のり（海苔）の養殖が全国トップクラスで、佐賀県・福岡県が主産地。'},
+    {q:'九州の農業の特色として「二毛作」が行われることがある。二毛作とは？',
+     c:['2種類の作物を同時に栽培','同じ田畑で1年に2回、異なる作物を栽培','有機農業のこと','2つの農場を所有すること'],a:1,
+     exp:'二毛作は同じ耕地で1年に2種類の作物を栽培する方法。九州は温暖なため、稲の後に麦を作るなど二毛作が可能。'},
+    {q:'九州南部でさかんな「畜産」が全国的に重要な理由は？',
+     c:['輸出量が多いから','肉牛・豚の飼育頭数が全国の約20%を占めるほど多いから','安い飼料が手に入るから','政府の補助金が多いから'],a:1,
+     exp:'鹿児島・宮崎は肉牛・豚の産出額が全国1位・2位。九州全体で全国の約20%を占め、食肉供給の重要拠点。'},
+    {q:'九州の農業で「大消費地への距離」が課題になる理由は？',
+     c:['九州が北海道より遠いから','東京・大阪などの大消費地から距離があり輸送コストがかかるから','農産物が重いから','道路が整備されていないから'],a:1,
+     exp:'九州は大消費地（東京・大阪）から遠く、生鮮品の輸送コストが課題。航空輸送や高速フェリーなどで対応している。'},
+    {q:'【地図】促成栽培がさかんな「宮崎県」は九州のどこに位置する？',
+     c:['九州の北西部','九州の北東部','九州の南東部（太平洋側）','九州の南西部'],a:2,
+     mapHint:'大分県の南・鹿児島県の東・太平洋（日向灘）に面した県',
+     exp:'宮崎県は九州南東部の太平洋側に位置。黒潮の影響で温暖・多雨な気候が促成栽培に適している。'},
+  ]
+},
+{
+  id:3,
+  name:'④ 都市・産業の発展',
+  icon:'🏭',
+  difficulty:2,
+  bonus:600000000,
+  properties:['北九州工業地帯','IC工場（熊本・大分）','福岡商業地区','造船所（長崎）'],
+  theme:'九州の工業・都市・経済の特色を学ぼう',
+  questions:[
+    {q:'北九州工業地帯でかつて中心だった工業は？',
+     c:['機械工業','化学工業','鉄鋼・金属工業','繊維工業'],a:2,
+     exp:'北九州は1901年創業の八幡製鉄所を中心に鉄鋼業で発展。中国からの石炭・鉄鉱石輸入に便利な立地が強みだった。'},
+    {q:'北九州工業地帯の現在の中心工業は？',
+     c:['鉄鋼業のみ','自動車・IC（集積回路）など機械工業','農産物加工','石炭採掘'],a:1,
+     exp:'現在の北九州は鉄鋼から自動車・IC・ロボットなど先端産業にシフト。エコタウン事業で環境産業も集積している。'},
+    {q:'熊本県・大分県で近年急速に発展している産業は？',
+     c:['石炭採掘','IC（半導体）・電子部品工業','繊維工業','農産物加工'],a:1,
+     exp:'九州は「シリコンアイランド」と呼ばれ、IC（半導体）工場が集積。特に熊本県（TSMC進出）が注目されている。'},
+    {q:'九州が「シリコンアイランド」と呼ばれる理由は？',
+     c:['砂（シリカ）が多いから','IC・半導体工場が多く集積しているから','シリコン（ケイ素）が採れるから','アメリカのシリコンバレーと提携しているから'],a:1,
+     exp:'半導体の主原料シリコン（ケイ素）にちなみ、IC工場が多い九州は「シリコンアイランド」と呼ばれる。清浄な空気・水・土地が工場立地に適している。'},
+    {q:'長崎県で古くからさかんな工業は？',
+     c:['自動車工業','造船業','石油化学','電子工業'],a:1,
+     exp:'長崎は江戸時代から開港した港町。リアス海岸の地形を活かした造船業が発達し、現在も三菱長崎造船所などが操業。'},
+    {q:'北九州市が環境都市として行っている取り組み「エコタウン事業」とは？',
+     c:['工場をすべて廃止した','廃棄物をリサイクルする環境産業を集めた工業地区をつくった','緑地を増やした','農業に転換した'],a:1,
+     exp:'北九州エコタウンは廃棄物のリサイクルを中心とした環境産業を集積。かつての公害都市から環境モデル都市への転換を果たした。'},
+    {q:'九州の中心都市・福岡市の特徴として正しいのは？',
+     c:['工業が中心で住宅が少ない','九州最大の都市で商業・サービス業が発展しアジアとの交流も盛ん','農業が中心','人口が減少している'],a:1,
+     exp:'福岡市は九州・沖縄地方の中心都市。商業・金融・IT産業が集積し、韓国・中国との距離が近くアジアビジネスの拠点。'},
+    {q:'九州の工業立地で「臨海部（海沿い）」が選ばれる主な理由は？',
+     c:['観光客が多いから','原料・製品の輸送に船が使えるから','気温が安定しているから','土地が安いから'],a:1,
+     exp:'重工業は大量の原料を必要とするため、大型船が接岸できる臨海部に立地することが多い。北九州・大分・長崎が代表例。'},
+    {q:'大分県の「大分コンビナート」でさかんな工業は？',
+     c:['精密機械工業','石油化学・鉄鋼などの重化学工業','食品加工','繊維工業'],a:1,
+     exp:'大分コンビナートは石油化学・鉄鋼の一大拠点。大型タンカーが接岸できる別府湾の臨海立地を活かしている。'},
+    {q:'九州と中国・韓国など東アジアの結びつきの特徴は？',
+     c:['距離が遠く貿易が少ない','地理的に近く人的・経済的交流が活発','対立が多く交流できない','歴史的に関係がない'],a:1,
+     exp:'九州は東アジアに最も近い日本の地域。古代から大陸との交流の窓口で、現在も観光・貿易・技術交流が活発。'},
+    {q:'「北九州工業地帯」の工業出荷額が他の三大工業地帯と比べて相対的に少ない理由は？',
+     c:['人口が少ないから','石炭から石油へのエネルギー転換で鉄鋼業が衰退したから','工場が海外に移転したから','交通が不便だから'],a:1,
+     exp:'1960年代のエネルギー革命（石炭から石油へ）で北九州の鉄鋼業は競争力を失った。その後の産業転換に時間がかかった。'},
+    {q:'九州で増加している「IC工場」の立地条件として正しいのは？',
+     c:['港や臨海部に集中している','清浄な空気・水・高速道路沿いの内陸部に多い','農村地帯に多い','離島に多い'],a:1,
+     exp:'IC工場は微細な電子部品を製造するため清浄な空気・水が必要。高速道路で空港と結ばれた内陸部に立地することが多い。'},
+    {q:'九州の中心都市・福岡市が「アジアの玄関口」と呼ばれる理由は？',
+     c:['アジアの中央に位置するから','東アジア各都市に最も近い日本の大都市だから','アジアから移民が多いから','アジア料理が有名だから'],a:1,
+     exp:'福岡市はソウル・上海・台北などアジア主要都市まで飛行機で2〜3時間以内。東京より近い都市も多く国際交流が盛ん。'},
+    {q:'九州の工業で「自動車産業」が発展した背景として正しいのは？',
+     c:['鉄鋼業の技術を転用できた','高速道路・港湾の整備と豊富な労働力が整ったから','農産物を自動車に転用したから','政府の強制的な政策'],a:1,
+     exp:'九州自動車道の整備・工場用地の確保・良質な労働力などが揃い、トヨタ・日産などの自動車工場が進出した。'},
+    {q:'【地図】北九州工業地帯がある「北九州市」は九州のどこに位置する？',
+     c:['九州の最南端','九州の中央部','九州の最北端・関門海峡沿い','九州の西端'],a:2,
+     mapHint:'本州（山口県）と関門海峡をはさんで向き合う九州北端の都市',
+     exp:'北九州市は関門海峡を挟んで山口県下関市と向き合う九州最北端の工業都市。八幡製鉄所発祥の地として近代工業の歴史を持つ。'},
+  ]
+},
+{
+  id:4,
+  name:'⑤ 環境問題・南西諸島',
+  icon:'🌺',
+  difficulty:3,
+  bonus:700000000,
+  properties:['水俣病資料館','サンゴ礁（沖縄）','サトウキビ農園','亜熱帯観光地'],
+  theme:'九州の環境問題と南西諸島の自然・文化・産業を学ぼう',
+  questions:[
+    {q:'熊本県水俣市で発生した「水俣病」の原因物質は？',
+     c:['放射性物質','有機水銀（メチル水銀）','硫黄酸化物','カドミウム'],a:1,
+     exp:'水俣病は化学工場（チッソ）が排出した有機水銀（メチル水銀）が魚介類に蓄積し、食べた人々に神経障害をもたらした公害病。'},
+    {q:'水俣病は日本の「四大公害病」の一つ。四大公害病に含まれないのは？',
+     c:['水俣病','新潟水俣病','イタイイタイ病','インフルエンザ'],a:3,
+     exp:'四大公害病は水俣病・新潟水俣病（阿賀野川）・イタイイタイ病（富山）・四日市ぜんそく（三重）。インフルエンザは感染症で公害とは無関係。'},
+    {q:'水俣病の教訓から現在行われていることとして正しいのは？',
+     c:['工場をすべて廃止','環境保全・水質改善・水俣病の記憶を伝える取り組み','被害者への補償を止めた','化学工場を増やした'],a:1,
+     exp:'水俣市は公害の教訓を活かし、環境モデル都市として水質改善・廃棄物削減などに取り組む。水俣病の記憶を伝える活動も続く。'},
+    {q:'北九州市でかつて深刻だった環境問題は？',
+     c:['水質汚染','工場の煙による大気汚染（洞海湾の汚染も）','土壌汚染のみ','騒音問題のみ'],a:1,
+     exp:'北九州は高度経済成長期に工場の煤煙で空が黒く染まり「七色の煙」と呼ばれた。市民・企業・行政の努力で現在は改善。'},
+    {q:'沖縄県（南西諸島）の気候の特徴は？',
+     c:['亜寒帯（冷帯）で冬が厳しい','亜熱帯気候で年中温暖・多雨','内陸性気候で気温差が大きい','砂漠気候で雨が少ない'],a:1,
+     exp:'沖縄は亜熱帯気候に属し、年平均気温22〜23℃。梅雨が長く台風が多い。サンゴ礁や熱帯性の動植物が多い。'},
+    {q:'沖縄県でさかんな農業として正しいのは？',
+     c:['りんご・ぶどう','サトウキビ・パイナップル・菊（電照菊）','稲作のみ','じゃがいも'],a:1,
+     exp:'沖縄の温暖な気候を利用してサトウキビ（砂糖の原料）・パイナップル・電照菊（開花時期を調整）などを栽培。'},
+    {q:'沖縄県の河川が短く水不足になりやすい理由は？',
+     c:['雨が全く降らないから','島が小さく川が短いため雨水が海へ流れ出てしまうから','山が高すぎるから','人口が多いから'],a:1,
+     exp:'沖縄は年間降水量が多いが、島が小さく川が短いため雨水が素早く海へ流れてしまう。水不足解消のためダムが整備された。'},
+    {q:'沖縄県の産業で最も重要なのは？',
+     c:['製造業','農業のみ','観光業・第3次産業','漁業のみ'],a:2,
+     exp:'沖縄は観光業が基幹産業。美しいサンゴ礁の海・独自の文化・歴史などが観光資源。年間1000万人以上が訪れる。'},
+    {q:'沖縄県に残るアメリカ軍基地の問題として正しいのは？',
+     c:['基地が観光に役立っている','基地が県土の約15%を占め騒音・事故などの問題がある','基地の縮小は完了した','基地は沖縄の人々が要請した'],a:1,
+     exp:'沖縄の米軍基地は第二次大戦後からあり、日本全体の米軍専用施設の約70%が沖縄に集中。騒音・環境問題・返還が課題。'},
+    {q:'沖縄の独自の文化として正しいのは？',
+     c:['北海道アイヌ文化と同じ','琉球王国の歴史に基づく独自の文化（三線・空手・琉球舞踊）','中国から直接移植された文化','大和（本土）と全く同じ文化'],a:1,
+     exp:'沖縄はかつて琉球王国として独自に発展。三線（楽器）・空手・琉球舞踊・首里城など独自の文化が今も息づく。'},
+    {q:'南西諸島（奄美・沖縄）の自然環境の特徴は？',
+     c:['針葉樹林が広がる','マングローブ・サンゴ礁・熱帯性の動植物が豊富','砂漠が広がる','高山植物が多い'],a:1,
+     exp:'南西諸島は亜熱帯の豊かな自然が広がる。マングローブ林・サンゴ礁・ジュゴン・ヤンバルクイナなど希少な生物も生息。'},
+    {q:'沖縄の「サンゴ礁」が近年危機に瀕している主な原因は？',
+     c:['漁師が魚を捕りすぎているから','海水温の上昇（地球温暖化）・生活排水・赤土流出などで白化・死滅が進んでいる','サンゴ礁は元々少なかった','海流が変わったから'],a:1,
+     exp:'地球温暖化による海水温上昇でサンゴが白化（共生藻が抜ける）し死滅。赤土流出・水質悪化も重なり、沖縄のサンゴ礁は深刻な危機に。'},
+    {q:'奄美大島（鹿児島県）の自然の特徴として正しいのは？',
+     c:['北海道のような針葉樹林が広がる','亜熱帯の自然が豊かでアマミノクロウサギなど固有種が多い','砂漠性の植物が多い','高山帯の植物が見られる'],a:1,
+     exp:'奄美大島は亜熱帯の豊かな自然が残る。アマミノクロウサギ・ルリカケスなど奄美にしかいない固有種が多く、世界自然遺産に登録。'},
+    {q:'環境問題への取り組みとして「水俣市」が現在行っていることは？',
+     c:['工業都市として再開発中','環境モデル都市として世界に「水俣の教訓」を発信している','被害者を無視している','観光開発のみ行っている'],a:1,
+     exp:'水俣市は公害を乗り越え「環境首都」を目指す。ごみ分別（22分別）・有機農業・環境教育など先進的な取り組みを世界に発信。'},
+    {q:'【地図】南西諸島（沖縄）は九州本島からどの方向に位置する？',
+     c:['北東方向','北西方向','南西方向','南東方向'],a:2,
+     mapHint:'東シナ海・太平洋に囲まれた九州南西の島々の連なり',
+     exp:'南西諸島は九州の南西方向に弧を描いて連なる。沖縄本島・宮古島・石垣島などからなり、台湾に近い位置にある。'},
+  ]
+}
+];
+
+// =====================================================
+// ゲームロジック
+// =====================================================
+let gs = { totalAsset:0, clearedStages:[], currentStage:null, qIndex:0, correctCount:0 };
+
+function loadGame() {
+  try {
+    const d = JSON.parse(localStorage.getItem('kyushuTycoon')||'{}');
+    if (d.totalAsset !== undefined) gs = {...gs, ...d};
+  } catch(e) {}
+}
+function saveGame() {
+  localStorage.setItem('kyushuTycoon', JSON.stringify({totalAsset:gs.totalAsset, clearedStages:gs.clearedStages}));
+}
+function formatAsset(n) {
+  if (n>=1e12) return (n/1e12).toFixed(1)+'兆円';
+  if (n>=1e8) return Math.floor(n/1e8)+'億円';
+  if (n>=1e4) return Math.floor(n/1e4)+'万円';
+  return n.toLocaleString()+'円';
+}
+function updateAsset() { document.getElementById('assetDisplay').textContent = formatAsset(gs.totalAsset); }
+
+function spawnCoins(x,y,n) {
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    el.className='coin-pop';
+    el.style.left=(x+(Math.random()-0.5)*50)+'px';
+    el.style.top=y+'px';
+    el.style.animationDelay=(i*0.08)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1200);
+  }
+}
+
+function initCoinRain() {
+  const c=document.getElementById('coinRain');
+  const sizes=['big','med','med','small','small','small'];
+  for(let i=0;i<40;i++){
+    const d=document.createElement('div');
+    const size=sizes[Math.floor(Math.random()*sizes.length)];
+    const sparkle=size==='big'&&Math.random()>0.4;
+    d.className='coin-drop '+size+(sparkle?' sparkle':'');
+    d.style.left=(Math.random()*110-5)+'%';
+    d.style.animationDuration=(2.5+Math.random()*4)+'s';
+    d.style.animationDelay=(Math.random()*7)+'s';
+    c.appendChild(d);
+  }
+}
+
+function startGame() {
+  loadGame();
+  document.getElementById('title-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  renderStageBar();
+  updateAsset();
+}
+
+function renderStageBar() {
+  const bar=document.getElementById('stageBar');
+  bar.innerHTML='';
+  STAGES.forEach((s,i)=>{
+    const cleared=gs.clearedStages.includes(i);
+    const locked=i>0&&!gs.clearedStages.includes(i-1);
+    const btn=document.createElement('button');
+    btn.className='stage-btn'+(cleared?' cleared':'')+(locked?' locked':'')+(gs.currentStage===i?' active':'');
+    btn.textContent=s.icon+' '+s.name;
+    if(!locked) btn.addEventListener('click',()=>selectStage(i));
+    bar.appendChild(btn);
+  });
+}
+
+function selectStage(i) {
+  gs.currentStage=i; gs.qIndex=0; gs.correctCount=0;
+  renderStageBar();
+  if(gs.clearedStages.includes(i)) renderCleared(i);
+  else renderQuestion();
+}
+
+function renderQuestion() {
+  const stage=STAGES[gs.currentStage];
+  const q=stage.questions[gs.qIndex];
+  const total=stage.questions.length;
+  const pct=Math.round(gs.qIndex/total*100);
+  const labels=['ア','イ','ウ','エ'];
+  const diffLabels=['','★☆☆ 基本','★★☆ 標準','★★★ 発展'];
+  const diffClass=['','diff-1','diff-2','diff-3'];
+
+  document.getElementById('mainContent').innerHTML=`
+    <div class="stage-header">
+      <h2>${stage.icon} ${stage.name}</h2>
+      <div class="stage-header-sub">${stage.theme}</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar" style="width:${pct}%"></div></div>
+        <div class="progress-text">${gs.qIndex}/${total}問　正解 ${gs.correctCount}問</div>
+      </div>
+    </div>
+    <div class="q-card">
+      <div class="q-num">
+        <span class="difficulty-badge ${diffClass[stage.difficulty]}">${diffLabels[stage.difficulty]}</span>
+        　問${gs.qIndex+1}${q.mapHint?' 🗾 地図問題':''}
+      </div>
+      <div class="q-text">${q.q}</div>
+      ${q.mapHint?`<div class="map-hint-box"><div class="hint-label">📍 地図ヒント</div>${q.mapHint}</div>`:''}
+      <div class="choices" id="choices">
+        ${q.c.map((ch,ci)=>`
+          <button class="choice-btn" id="cb${ci}" onclick="answer(${ci})">
+            <span class="choice-label">${labels[ci]}</span>${ch}
+          </button>`).join('')}
+      </div>
+      <div class="explanation" id="exp"></div>
+      <button class="next-q-btn" id="nextBtn" onclick="nextQ()">
+        ${gs.qIndex+1<total?'次の問題へ ▶':'結果を見る 🏆'}
+      </button>
+    </div>`;
+}
+
+function answer(sel) {
+  const q=STAGES[gs.currentStage].questions[gs.qIndex];
+  document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);
+  const labels=['ア','イ','ウ','エ'];
+  const correct=sel===q.a;
+  document.getElementById('cb'+q.a).classList.add('correct');
+  document.getElementById('cb'+q.a).querySelector('.choice-label').textContent='⭕';
+  if(!correct){
+    document.getElementById('cb'+sel).classList.add('wrong');
+    document.getElementById('cb'+sel).querySelector('.choice-label').textContent='❌';
+  } else {
+    gs.correctCount++;
+    gs.totalAsset+=2000000;
+    updateAsset();
+    const rect=document.getElementById('assetDisplay').getBoundingClientRect();
+    spawnCoins(rect.left+rect.width/2,rect.top+rect.height/2,4);
+  }
+  const expEl=document.getElementById('exp');
+  expEl.className='explanation '+(correct?'correct-exp':'wrong-exp');
+  expEl.style.display='block';
+  expEl.innerHTML=(correct?'⭕ 正解！　':`❌ 不正解。正解は「${labels[q.a]}：${q.c[q.a]}」　`)+q.exp;
+  document.getElementById('nextBtn').style.display='block';
+  saveGame();
+}
+
+function nextQ() {
+  gs.qIndex++;
+  if(gs.qIndex>=STAGES[gs.currentStage].questions.length) showClear();
+  else renderQuestion();
+}
+
+function showClear() {
+  const stage=STAGES[gs.currentStage];
+  const si=gs.currentStage;
+  if(!gs.clearedStages.includes(si)){
+    gs.clearedStages.push(si);
+    gs.totalAsset+=stage.bonus;
+    saveGame();
+  }
+  updateAsset(); renderStageBar();
+  const next=si<STAGES.length-1;
+  document.getElementById('mainContent').innerHTML=`
+    <div class="stage-clear-card">
+      <div style="font-size:3rem">🎉</div>
+      <h2>${stage.name} クリア！</h2>
+      <div style="color:var(--gold-light);margin:0.5rem 0;font-size:0.85rem">制覇ボーナス</div>
+      <div class="bonus-num">+${formatAsset(stage.bonus)}</div>
+      <div class="score-display">
+        <div class="score-item"><div class="score-label">正解数</div><div class="score-val">${gs.correctCount}/${stage.questions.length}</div></div>
+        <div class="score-item"><div class="score-label">総資産</div><div class="score-val">${formatAsset(gs.totalAsset)}</div></div>
+      </div>
+      <div style="color:var(--gold-light);margin:1rem 0 0.5rem;font-size:0.82rem">取得した物件</div>
+      <div class="property-list">${stage.properties.map(p=>`<span class="prop-badge">🏢 ${p}</span>`).join('')}</div>
+      ${next
+        ?`<button class="next-stage-btn" onclick="selectStage(${si+1})">次のステージへ ▶</button>`
+        :`<div style="font-size:1.3rem;color:var(--gold3);margin-top:1rem">🏆 九州地方 完全制覇！<br><span style="font-size:0.9rem">総資産：${formatAsset(gs.totalAsset)}</span></div>`}
+    </div>`;
+  for(let i=0;i<6;i++) setTimeout(()=>spawnCoins(window.innerWidth/2,window.innerHeight/2,8),i*180);
+}
+
+function renderCleared(i) {
+  const stage=STAGES[i];
+  document.getElementById('mainContent').innerHTML=`
+    <div class="stage-clear-card">
+      <div style="font-size:2.5rem">✅</div>
+      <h2>${stage.name} クリア済み</h2>
+      <div class="property-list">${stage.properties.map(p=>`<span class="prop-badge">🏢 ${p}</span>`).join('')}</div>
+      <button class="next-stage-btn" style="margin-top:1rem" onclick="replayStage(${i})">もう一度挑戦</button>
+    </div>`;
+}
+
+function replayStage(i) { gs.qIndex=0; gs.correctCount=0; gs.currentStage=i; renderQuestion(); }
+
+// 初期化
+initCoinRain();
+(function(){
+  function init(){
+    document.getElementById('startBtn').addEventListener('click',startGame);
+    try{
+      const d=JSON.parse(localStorage.getItem('kyushuTycoon')||'{}');
+      if(d.totalAsset>0) document.getElementById('saveInfo').textContent='💾 セーブデータあり　総資産：'+formatAsset(d.totalAsset);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+</body>
+</html>
