@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quest ✨ 英単語の冒険</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1628;
+  --panel: #162040;
+  --panel2: #1e2d55;
+  --border: #2a3f7a;
+  --gold: #ffd166;
+  --gold2: #f4a261;
+  --blue: #4cc9f0;
+  --green: #06d6a0;
+  --red: #ef476f;
+  --text: #e8edf8;
+  --muted: #6b7db3;
+  --st1-color: #4cc9f0;
+  --st2-color: #06d6a0;
+  --st3-color: #f4a261;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(76,201,240,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(244,162,97,0.07) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+.stars-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: var(--o); } to { opacity: calc(var(--o)*0.15); } }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+@keyframes pop { from{transform:scale(0.6);opacity:0} to{transform:scale(1);opacity:1} }
+
+#app { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding-bottom: 72px; }
+
+/* HEADER */
+header {
+  background: linear-gradient(180deg, #080e1e 0%, var(--panel) 100%);
+  border-bottom: 2px solid var(--border);
+  padding: 12px 16px 10px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+.h-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.logo { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
+.logo em { color: var(--blue); font-style: normal; }
+.h-badges { display: flex; gap: 8px; }
+.badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: var(--panel2); border: 1px solid var(--border); color: var(--gold); }
+.badge.fire { background: linear-gradient(135deg,#c0392b,#e74c3c); border: none; color: #fff; }
+.exp-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
+.exp-track { height: 8px; background: var(--panel2); border-radius: 8px; overflow: hidden; border: 1px solid rgba(76,201,240,0.15); }
+.exp-fill { height: 100%; background: linear-gradient(90deg, #4cc9f0, #7b2d8b, var(--gold)); border-radius: 8px; transition: width .6s cubic-bezier(.22,1,.36,1); box-shadow: 0 0 8px rgba(76,201,240,0.5); }
+
+/* TABS */
+.tabs { display: flex; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.tab { flex: 1; padding: 11px 4px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); background: rgba(76,201,240,0.04); }
+
+/* CONTENT */
+.content { padding: 18px 16px; }
+
+/* HOME */
+.hero-card {
+  background: linear-gradient(135deg, var(--panel) 0%, #1a2a50 100%);
+  border: 1px solid var(--border); border-radius: 18px; padding: 20px; text-align: center; margin-bottom: 18px;
+  position: relative; overflow: hidden;
+}
+.hero-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(76,201,240,0.12), transparent); border-radius: 50%; pointer-events: none; }
+.hero-avatar { font-size: 3.8rem; display: block; margin-bottom: 8px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(76,201,240,0.5)); }
+.hero-lv { font-family: 'Fredoka One', cursive; font-size: 2.4rem; color: var(--gold); line-height: 1; text-shadow: 0 0 16px rgba(255,209,102,0.5); }
+.hero-lv-label { font-size: 0.68rem; color: var(--muted); }
+.hero-title-badge { display: inline-block; margin-top: 6px; padding: 3px 12px; background: var(--panel2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; color: var(--blue); font-weight: 700; }
+
+.section-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
+
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.stat-mini { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+.stat-mini-val { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold); }
+.stat-mini-label { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
+
+.mission-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+.mission-card.done { border-color: var(--green); opacity: 0.7; }
+.mc-icon { font-size: 1.3rem; flex-shrink: 0; }
+.mc-body { flex: 1; }
+.mc-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
+.mc-bar-track { height: 4px; background: var(--panel2); border-radius: 4px; overflow: hidden; }
+.mc-bar-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width .5s; }
+.mc-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+.mc-check { font-size: 1.1rem; flex-shrink: 0; }
+
+.stage-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.stage-card { background: var(--panel); border: 2px solid transparent; border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
+.stage-card.locked { opacity: 0.45; cursor: default; }
+.stage-card.sel { border-color: var(--blue); background: rgba(76,201,240,0.07); }
+.stage-card:hover:not(.locked):not(.sel) { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.stage-icon { font-size: 1.8rem; margin-bottom: 5px; }
+.stage-name { font-size: 0.72rem; font-weight: 700; margin-bottom: 3px; }
+.stage-desc { font-size: 0.62rem; color: var(--muted); line-height: 1.4; }
+.stage-unlock { font-size: 0.6rem; color: var(--gold); margin-top: 4px; }
+.stage-pip { position: absolute; top: 5px; right: 7px; font-size: 0.58rem; color: var(--muted); }
+
+.word-progress-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 5px; margin-bottom: 18px; }
+.word-dot { aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; background: var(--panel2); color: var(--muted); transition: all .3s; }
+.word-dot.st1 { background: rgba(76,201,240,0.2); border-color: var(--st1-color); color: var(--st1-color); }
+.word-dot.st2 { background: rgba(6,214,160,0.2); border-color: var(--st2-color); color: var(--st2-color); }
+.word-dot.st3 { background: rgba(244,162,97,0.2); border-color: var(--st3-color); color: var(--st3-color); }
+.word-dot.mastered { background: rgba(255,209,102,0.2); border-color: var(--gold); color: var(--gold); }
+
+.start-btn { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, #4361ee, #7b2d8b); border: none; border-radius: 14px; color: #fff; font-family: 'Noto Sans JP', sans-serif; font-size: 1.05rem; font-weight: 900; cursor: pointer; margin-top: 18px; letter-spacing: 1px; box-shadow: 0 4px 20px rgba(67,97,238,0.4); transition: all .2s; }
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(67,97,238,0.6); }
+
+/* QUEST */
+.stage-banner { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.stage-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+.stage-badge.s1 { background: rgba(76,201,240,0.15); color: var(--st1-color); border: 1px solid var(--st1-color); }
+.stage-badge.s2 { background: rgba(6,214,160,0.15); color: var(--st2-color); border: 1px solid var(--st2-color); }
+.stage-badge.s3 { background: rgba(244,162,97,0.15); color: var(--st3-color); border: 1px solid var(--st3-color); }
+.q-counter { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+.combo-display { font-size: 0.75rem; color: var(--gold); font-weight: 700; }
+
+.q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 22px 18px; margin: 14px 16px; min-height: 100px; position: relative; overflow: hidden; }
+.q-card::before { content: attr(data-word); position: absolute; right: -10px; bottom: -20px; font-size: 4.5rem; opacity: 0.04; font-family: 'Fredoka One', cursive; pointer-events: none; white-space: nowrap; }
+.q-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+.q-main { font-size: 1.35rem; font-weight: 900; line-height: 1.4; color: #fff; }
+.q-main.english { font-family: 'Fredoka One', cursive; color: var(--blue); font-size: 2rem; letter-spacing: 1px; }
+.q-hint { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+.q-hint span { color: var(--gold); font-family: 'Fredoka One', cursive; letter-spacing: 2px; }
+
+.choices-wrap { padding: 0 16px; display: flex; flex-direction: column; gap: 9px; margin-bottom: 12px; }
+.choice-btn { background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 13px 15px; color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 0.88rem; font-weight: 700; text-align: left; cursor: pointer; transition: all .18s; display: flex; align-items: center; gap: 10px; }
+.choice-btn:hover:not(:disabled) { border-color: rgba(76,201,240,0.5); background: rgba(76,201,240,0.05); transform: translateX(4px); }
+.choice-btn.correct { border-color: var(--green); background: rgba(6,214,160,0.1); color: var(--green); }
+.choice-btn.wrong { border-color: var(--red); background: rgba(239,71,111,0.1); color: #ff8fa3; }
+.choice-num { width: 26px; height: 26px; border-radius: 50%; background: var(--panel2); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; flex-shrink: 0; }
+
+.input-wrap { padding: 0 16px; margin-bottom: 12px; }
+.ans-input { width: 100%; background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; color: #fff; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; outline: none; transition: border-color .2s; }
+.ans-input:focus { border-color: var(--st2-color); }
+.ans-input.correct { border-color: var(--green); }
+.ans-input.wrong { border-color: var(--red); }
+.ans-input::placeholder { font-family: 'Noto Sans JP',sans-serif; font-size: 0.9rem; letter-spacing: 0; color: var(--muted); }
+.sentence-input { width: 100%; background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; color: #fff; font-family: 'Noto Sans JP', sans-serif; font-size: 1rem; font-weight: 700; outline: none; transition: border-color .2s; resize: none; min-height: 80px; }
+.sentence-input:focus { border-color: var(--st3-color); }
+.sentence-input.correct { border-color: var(--green); }
+.sentence-input.wrong { border-color: var(--red); }
+
+.submit-btn { width: 100%; padding: 13px; border: none; border-radius: 12px; color: #fff; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; margin-top: 8px; transition: all .2s; background: linear-gradient(135deg, #06d6a0, #028a60); }
+.submit-btn.st3 { background: linear-gradient(135deg, var(--st3-color), #c87941); }
+.submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+.feedback-bar { margin: 0 16px 12px; padding: 13px 15px; border-radius: 12px; display: none; gap: 11px; align-items: flex-start; }
+.feedback-bar.show { display: flex; }
+.feedback-bar.ok { background: rgba(6,214,160,0.1); border: 1px solid var(--green); }
+.feedback-bar.ng { background: rgba(239,71,111,0.08); border: 1px solid var(--red); }
+.fb-icon { font-size: 1.4rem; flex-shrink: 0; }
+.fb-body { font-size: 0.82rem; line-height: 1.6; }
+.fb-answer { font-weight: 700; color: var(--gold); font-family: 'Fredoka One', cursive; font-size: 0.95rem; }
+.fb-exp { font-size: 0.72rem; color: var(--green); font-weight: 700; }
+.fb-retry { font-size: 0.72rem; color: var(--red); font-weight: 700; }
+
+.next-btn { display: none; width: calc(100% - 32px); margin: 0 16px; padding: 14px; border: none; border-radius: 12px; color: #0a1020; font-family: 'Noto Sans JP',sans-serif; font-size: 1rem; font-weight: 900; cursor: pointer; transition: all .2s; letter-spacing: 1px; background: linear-gradient(135deg, var(--gold), var(--gold2)); }
+.next-btn.show { display: block; }
+.next-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255,209,102,0.4); }
+
+/* RESULT */
+.result-wrap { padding: 20px 16px; text-align: center; }
+.result-icon { font-size: 4rem; margin-bottom: 10px; animation: pop .4s cubic-bezier(.22,1,.36,1); }
+.result-title { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--gold); }
+.result-round { font-size: 0.78rem; color: var(--muted); margin: 4px 0 16px; }
+.result-big { font-family: 'Fredoka One', cursive; font-size: 3.5rem; color: #fff; line-height: 1; }
+.result-acc { font-size: 0.85rem; color: var(--muted); margin-top: 4px; margin-bottom: 20px; }
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.result-cell { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.result-cell-val { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--gold); }
+.result-cell-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.wrong-list { background: var(--panel); border: 1px solid var(--red); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: left; }
+.wrong-list-title { font-size: 0.75rem; color: var(--red); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.wrong-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; }
+.wrong-item:last-child { border-bottom: none; }
+.wrong-en { font-family: 'Fredoka One', cursive; color: var(--blue); }
+.wrong-ja { color: var(--muted); }
+.action-btns { display: flex; flex-direction: column; gap: 10px; }
+.action-btn { padding: 14px; border: none; border-radius: 12px; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: all .2s; }
+.action-btn.primary { background: linear-gradient(135deg,#4361ee,#7b2d8b); color: #fff; }
+.action-btn.secondary { background: var(--panel); border: 1px solid var(--border); color: var(--text); }
+.action-btn:hover { transform: translateY(-2px); }
+
+/* STATUS */
+.status-hero { background: linear-gradient(135deg, var(--panel), #1a2a50); border: 1px solid var(--border); border-radius: 18px; padding: 24px 18px; text-align: center; margin-bottom: 16px; }
+.status-avatar { font-size: 4rem; margin-bottom: 8px; filter: drop-shadow(0 0 16px rgba(76,201,240,0.5)); }
+.status-lv { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--gold); }
+.status-title { font-size: 0.85rem; color: var(--muted); margin: 4px 0 14px; }
+.status-expbar { height: 10px; background: var(--panel2); border-radius: 10px; overflow: hidden; border: 1px solid rgba(76,201,240,0.15); }
+.status-expfill { height: 100%; background: linear-gradient(90deg,var(--blue),var(--gold)); border-radius: 10px; transition: width .6s; }
+.status-explabel { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+.st-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.st-stat { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+.st-stat-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.st-stat-val { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold); }
+.st-stat-label { font-size: 0.68rem; color: var(--muted); }
+.title-rows { margin-bottom: 16px; }
+.title-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--panel); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; margin-bottom: 7px; }
+.title-row.unlocked { border-color: var(--border); }
+.title-row.locked { opacity: 0.4; }
+.tr-icon { font-size: 1.2rem; }
+.tr-body { flex: 1; }
+.tr-name { font-size: 0.85rem; font-weight: 700; }
+.tr-cond { font-size: 0.7rem; color: var(--muted); }
+.tr-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
+.tr-badge.u { background: rgba(255,209,102,0.15); color: var(--gold); }
+.tr-badge.l { background: var(--panel2); color: var(--muted); }
+
+/* WORD TABLE */
+.word-table { width: 100%; border-collapse: collapse; }
+.word-table th { font-size: 0.65rem; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 1px; }
+.word-table td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+.word-table tr:last-child td { border-bottom: none; }
+.wt-en { font-family: 'Fredoka One', cursive; color: var(--blue); font-size: 1rem; }
+.wt-stage { padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; }
+.wt-stage.s0 { background: var(--panel2); color: var(--muted); }
+.wt-stage.s1 { background: rgba(76,201,240,0.15); color: var(--st1-color); }
+.wt-stage.s2 { background: rgba(6,214,160,0.15); color: var(--st2-color); }
+.wt-stage.s3 { background: rgba(244,162,97,0.15); color: var(--st3-color); }
+.wt-stage.sm { background: rgba(255,209,102,0.15); color: var(--gold); }
+.wt-acc { font-size: 0.78rem; color: var(--muted); }
+
+/* TOAST */
+.toast { position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-16px); background: var(--panel2); border: 1px solid var(--gold); border-radius: 12px; padding: 10px 20px; font-size: 0.88rem; font-weight: 700; color: var(--gold); z-index: 999; opacity: 0; pointer-events: none; transition: all .3s; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* LEVEL UP */
+.lu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; display: none; align-items: center; justify-content: center; }
+.lu-overlay.show { display: flex; }
+.lu-box { background: linear-gradient(135deg,var(--panel),#1a2a50); border: 2px solid var(--gold); border-radius: 20px; padding: 36px 28px; text-align: center; max-width: 300px; width: 90%; animation: pop .4s cubic-bezier(.22,1,.36,1); }
+.lu-icon { font-size: 3.5rem; margin-bottom: 10px; animation: float 2s ease-in-out infinite; }
+.lu-sub { font-family: 'Fredoka One', cursive; font-size: 0.9rem; color: var(--muted); margin-bottom: 4px; }
+.lu-lv { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--gold); text-shadow: 0 0 20px rgba(255,209,102,0.6); margin-bottom: 6px; }
+.lu-title { font-size: 0.88rem; color: var(--text); margin-bottom: 20px; }
+.lu-btn { padding: 12px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #0a1020; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="stars-bg" id="starsBg"></div>
+<div id="app">
+
+  <header>
+    <div class="h-top">
+      <div class="logo">✨ Word<em>Quest</em></div>
+      <div class="h-badges">
+        <div class="badge fire" id="streakBadge">🔥 1日</div>
+        <div class="badge" id="scoreBadge">💎 0pt</div>
+      </div>
+    </div>
+    <div class="exp-row">
+      <span id="hTitleLabel">見習い冒険者</span>
+      <span id="hExpLabel">EXP 0/80</span>
+    </div>
+    <div class="exp-track"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('home')">🏠 ホーム</div>
+    <div class="tab" onclick="switchTab('quest')">⚔️ クエスト</div>
+    <div class="tab" onclick="switchTab('words')">📖 単語帳</div>
+    <div class="tab" onclick="switchTab('status')">📊 ステータス</div>
+  </div>
+
+  <!-- HOME -->
+  <div id="tab-home" class="content">
+    <div class="hero-card">
+      <span class="hero-avatar" id="heroAvatar">🌱</span>
+      <div class="hero-lv" id="heroLv">1</div>
+      <div class="hero-lv-label">LEVEL</div>
+      <div class="hero-title-badge" id="heroTitleBadge">🌱 見習い冒険者</div>
+    </div>
+
+    <div class="section-label">📅 今日の進捗</div>
+    <div class="stats-row">
+      <div class="stat-mini"><div class="stat-mini-val" id="todayQNum">0</div><div class="stat-mini-label">今日の問題数</div></div>
+      <div class="stat-mini"><div class="stat-mini-val" id="todayAccNum">－</div><div class="stat-mini-label">正解率</div></div>
+      <div class="stat-mini"><div class="stat-mini-val" id="todayRoundsNum">0</div><div class="stat-mini-label">周回数</div></div>
+    </div>
+
+    <div class="section-label">✅ デイリーミッション</div>
+    <div class="mission-card" id="mc1">
+      <div class="mc-icon">⚔️</div>
+      <div class="mc-body">
+        <div class="mc-title">30問クリア（1周）</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc1bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc1sub">0 / 30 問</div>
+      </div>
+      <div class="mc-check" id="mc1check">⬜</div>
+    </div>
+    <div class="mission-card" id="mc2">
+      <div class="mc-icon">🎯</div>
+      <div class="mc-body">
+        <div class="mc-title">正解率80%以上</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc2bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc2sub">未達成</div>
+      </div>
+      <div class="mc-check" id="mc2check">⬜</div>
+    </div>
+    <div class="mission-card" id="mc3">
+      <div class="mc-icon">🔁</div>
+      <div class="mc-body">
+        <div class="mc-title">2周クリア</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc3bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc3sub">0 / 2 周</div>
+      </div>
+      <div class="mc-check" id="mc3check">⬜</div>
+    </div>
+
+    <div class="section-label" style="margin-top:18px">⭐ ステージ選択</div>
+    <div class="stage-cards">
+      <div class="stage-card sel" id="stCard0" onclick="selectStage(0)">
+        <div class="stage-pip">★</div>
+        <div class="stage-icon">👀</div>
+        <div class="stage-name" style="color:var(--st1-color)">Stage 1</div>
+        <div class="stage-desc">英語→日本語<br>4択クイズ</div>
+      </div>
+      <div class="stage-card locked" id="stCard1" onclick="selectStage(1)">
+        <div class="stage-pip">★★</div>
+        <div class="stage-icon">✍️</div>
+        <div class="stage-name" style="color:var(--st2-color)">Stage 2</div>
+        <div class="stage-desc">日本語→英語<br>スペル記述</div>
+        <div class="stage-unlock" id="st2unlock">Lv.3で解放</div>
+      </div>
+      <div class="stage-card locked" id="stCard2" onclick="selectStage(2)">
+        <div class="stage-pip">★★★</div>
+        <div class="stage-icon">💬</div>
+        <div class="stage-name" style="color:var(--st3-color)">Stage 3</div>
+        <div class="stage-desc">英文作成<br>応用問題</div>
+        <div class="stage-unlock" id="st3unlock">Lv.7で解放</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:18px">📊 単語の習熟度マップ</div>
+    <div class="word-progress-grid" id="wordDots"></div>
+
+    <button class="start-btn" onclick="startQuest()">⚔️ クエスト開始！</button>
+  </div>
+
+  <!-- QUEST -->
+  <div id="tab-quest" class="hidden">
+    <div id="questInner"></div>
+  </div>
+
+  <!-- WORDS -->
+  <div id="tab-words" class="content hidden">
+    <div class="section-label">📖 単語リスト（30語）</div>
+    <table class="word-table">
+      <thead><tr><th>英語</th><th>日本語</th><th>習熟</th><th>正解率</th></tr></thead>
+      <tbody id="wordTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- STATUS -->
+  <div id="tab-status" class="content hidden">
+    <div class="status-hero">
+      <div class="status-avatar" id="stAvatar">🌱</div>
+      <div class="status-lv">Lv. <span id="stLv">1</span></div>
+      <div class="status-title" id="stTitle">見習い冒険者</div>
+      <div class="status-expbar"><div class="status-expfill" id="stExpFill" style="width:0%"></div></div>
+      <div class="status-explabel" id="stExpLabel">EXP: 0 / 80</div>
+    </div>
+    <div class="st-stats">
+      <div class="st-stat"><div class="st-stat-icon">💎</div><div class="st-stat-val" id="stScore">0</div><div class="st-stat-label">総スコア</div></div>
+      <div class="st-stat"><div class="st-stat-icon">📝</div><div class="st-stat-val" id="stTotal">0</div><div class="st-stat-label">総回答数</div></div>
+      <div class="st-stat"><div class="st-stat-icon">✅</div><div class="st-stat-val" id="stCorrect">0</div><div class="st-stat-label">正解数</div></div>
+      <div class="st-stat"><div class="st-stat-icon">🔁</div><div class="st-stat-val" id="stRounds">0</div><div class="st-stat-label">総周回数</div></div>
+    </div>
+    <div class="section-label">🏆 称号一覧</div>
+    <div class="title-rows" id="titleRows"></div>
+  </div>
+</div>
+
+<div class="lu-overlay" id="luOverlay">
+  <div class="lu-box">
+    <div class="lu-icon">⭐</div>
+    <div class="lu-sub">LEVEL UP!</div>
+    <div class="lu-lv" id="luLv">Lv.2</div>
+    <div class="lu-title" id="luTitle">称号：見習い冒険者</div>
+    <button class="lu-btn" onclick="closeLu()">続ける ▶</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const WORDS = [
+  {en:"abroad",    ja:"海外へ・外国で",  ex:"She studied abroad last year.",       exJa:"彼女は昨年海外で勉強しました。"},
+  {en:"agree",     ja:"同意する",        ex:"I agree with your opinion.",          exJa:"私はあなたの意見に同意します。"},
+  {en:"already",   ja:"すでに・もう",    ex:"I have already finished my homework.", exJa:"私はすでに宿題を終えています。"},
+  {en:"among",     ja:"〜の間で",        ex:"He is popular among his friends.",    exJa:"彼は友達の間で人気があります。"},
+  {en:"another",   ja:"別の・もう一つの",ex:"Can I have another cup of tea?",      exJa:"もう一杯お茶をいただけますか？"},
+  {en:"became",    ja:"〜になった",      ex:"She became a doctor.",                exJa:"彼女は医師になりました。"},
+  {en:"before",    ja:"〜の前に",        ex:"Wash your hands before eating.",      exJa:"食べる前に手を洗いなさい。"},
+  {en:"believe",   ja:"信じる",          ex:"I believe in you.",                   exJa:"私はあなたを信じています。"},
+  {en:"between",   ja:"〜の間に",        ex:"The park is between the school and the station.", exJa:"公園は学校と駅の間にあります。"},
+  {en:"bring",     ja:"持ってくる",      ex:"Please bring your textbook tomorrow.", exJa:"明日教科書を持ってきてください。"},
+  {en:"carry",     ja:"運ぶ",            ex:"Can you carry this bag for me?",      exJa:"このかばんを運んでもらえますか？"},
+  {en:"continue",  ja:"続ける",          ex:"Please continue your speech.",        exJa:"スピーチを続けてください。"},
+  {en:"decision",  ja:"決断・決定",      ex:"It was a difficult decision.",        exJa:"それは難しい決断でした。"},
+  {en:"delicious", ja:"おいしい",        ex:"This cake is delicious.",             exJa:"このケーキはおいしいです。"},
+  {en:"different", ja:"異なる・違う",    ex:"Our opinions are different.",         exJa:"私たちの意見は異なります。"},
+  {en:"excited",   ja:"興奮した・わくわくした", ex:"I am excited about the trip.", exJa:"私は旅行にわくわくしています。"},
+  {en:"experience",ja:"経験",            ex:"It was a great experience.",          exJa:"それは素晴らしい経験でした。"},
+  {en:"foreign",   ja:"外国の",          ex:"She can speak a foreign language.",   exJa:"彼女は外国語を話せます。"},
+  {en:"however",   ja:"しかしながら",    ex:"It was cold. However, we went out.",  exJa:"寒かった。しかし私たちは外出しました。"},
+  {en:"important", ja:"重要な",          ex:"It is important to study every day.", exJa:"毎日勉強することは重要です。"},
+  {en:"introduce", ja:"紹介する",        ex:"Let me introduce my friend.",         exJa:"友達を紹介させてください。"},
+  {en:"member",    ja:"メンバー・会員",  ex:"She is a member of the club.",        exJa:"彼女はクラブのメンバーです。"},
+  {en:"message",   ja:"メッセージ",      ex:"I got a message from her.",           exJa:"彼女からメッセージが届きました。"},
+  {en:"practice",  ja:"練習する",        ex:"I practice the piano every day.",     exJa:"私は毎日ピアノを練習します。"},
+  {en:"program",   ja:"番組・プログラム",ex:"I watched an interesting program.",   exJa:"私は面白い番組を見ました。"},
+  {en:"remember",  ja:"覚えている・思い出す", ex:"Do you remember her name?",     exJa:"彼女の名前を覚えていますか？"},
+  {en:"science",   ja:"科学",            ex:"I like science class.",               exJa:"私は理科の授業が好きです。"},
+  {en:"surprised", ja:"驚いた",          ex:"I was surprised at the news.",        exJa:"私はそのニュースに驚きました。"},
+  {en:"together",  ja:"一緒に",          ex:"Let's go to the park together.",      exJa:"一緒に公園に行きましょう。"},
+  {en:"volunteer", ja:"ボランティア",    ex:"I do volunteer work on weekends.",    exJa:"私は週末にボランティア活動をします。"},
+];
+
+const TITLES = [
+  {name:"見習い冒険者", icon:"🌱", cond:"スタート",  lv:1},
+  {name:"単語の見習い", icon:"📖", cond:"Lv.3到達",  lv:3},
+  {name:"言葉の戦士",   icon:"⚔️", cond:"Lv.5到達",  lv:5},
+  {name:"英語の探求者", icon:"🔍", cond:"Lv.8到達",  lv:8},
+  {name:"語彙の魔法使い",icon:"🧙",cond:"Lv.12到達", lv:12},
+  {name:"英語の賢者",   icon:"📚", cond:"Lv.16到達", lv:16},
+  {name:"言語マスター", icon:"👑", cond:"Lv.20到達", lv:20},
+];
+const AVATARS = ["🌱","🌱","🌿","🌿","⚔️","⚔️","⚔️","⚔️","🧙","🧙","🧙","🧙","📚","📚","📚","📚","🔮","🔮","🔮","👑"];
+const EXP_PER_LV = Array.from({length:30},(_,i)=>(i+1)*80);
+
+const G = {
+  lv:1, exp:0, score:0,
+  totalQ:0, totalOk:0, streak:1, totalRounds:0,
+  todayQ:0, todayOk:0, todayRounds:0,
+  selectedStage:0,
+  words: WORDS.map(()=>({stageReached:0, attempts:0, correct:0}))
+};
+let QS = null;
+
+// Stars
+(function(){
+  const c=document.getElementById('starsBg');
+  for(let i=0;i<50;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2+0.8;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.15+Math.random()*0.5};animation-delay:${Math.random()*4}s`;
+    c.appendChild(s);
+  }
+})();
+
+function switchTab(t){
+  ['home','quest','words','status'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['home','quest','words','status'][i]===t));
+  if(t==='words') renderWordTable();
+  if(t==='status') renderStatus();
+}
+
+function selectStage(s){
+  if(s===1&&G.lv<3){showToast('⚠️ Lv.3で解放されます！');return;}
+  if(s===2&&G.lv<7){showToast('⚠️ Lv.7で解放されます！');return;}
+  G.selectedStage=s;
+  [0,1,2].forEach(i=>document.getElementById('stCard'+i).classList.toggle('sel',i===s));
+}
+
+function updateStageLocks(){
+  if(G.lv>=3){document.getElementById('stCard1').classList.remove('locked');const u=document.getElementById('st2unlock');if(u)u.style.display='none';}
+  if(G.lv>=7){document.getElementById('stCard2').classList.remove('locked');const u=document.getElementById('st3unlock');if(u)u.style.display='none';}
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function makeQ(wi, stage){
+  const w=WORDS[wi];
+  if(stage===0){
+    const wrong=shuffle(WORDS.filter((_,i)=>i!==wi)).slice(0,3).map(x=>x.ja);
+    const choices=shuffle([w.ja,...wrong]);
+    return {type:'choice',wi,stage,prompt:w.en,choices,answer:w.ja,exp:8};
+  } else if(stage===1){
+    return {type:'input',wi,stage,prompt:w.ja,hint:w.en[0],answer:w.en,exp:15};
+  } else {
+    return {type:'sentence',wi,stage,prompt:w.exJa,answer:w.ex,wordHint:w.en,exp:25};
+  }
+}
+
+function startQuest(){
+  const idxs=shuffle([...Array(WORDS.length).keys()]);
+  QS={
+    qs:idxs.map(i=>makeQ(i,G.selectedStage)),
+    retryQueue:[],
+    idx:0, correct:0, total:0,
+    sessionExp:0, wrongWords:[], combo:0, maxCombo:0, answered:false
+  };
+  switchTab('quest');
+  renderQ();
+}
+
+function currentQ(){
+  if(QS.idx<QS.qs.length) return QS.qs[QS.idx];
+  if(QS.retryQueue.length>0) return QS.retryQueue[0];
+  return null;
+}
+
+function renderQ(){
+  const q=currentQ();
+  if(!q){renderResult();return;}
+  QS.answered=false;
+  const stL=['Stage 1　英→日','Stage 2　日→英','Stage 3　英文作成'];
+  const stC=['s1','s2','s3'];
+  const prog=QS.idx<QS.qs.length?`${QS.idx+1} / ${QS.qs.length}`:`復習 残${QS.retryQueue.length}問`;
+  const comboTxt=QS.combo>1?`🔥 ${QS.combo}コンボ！`:'';
+  let qHTML='';
+  if(q.type==='choice'){
+    const labs=['Ａ','Ｂ','Ｃ','Ｄ'];
+    qHTML=`
+      <div class="q-card" data-word="${q.prompt}">
+        <div class="q-label">この英単語の意味は？</div>
+        <div class="q-main english">${q.prompt}</div>
+      </div>
+      <div class="choices-wrap">
+        ${q.choices.map((c,i)=>`<button class="choice-btn" id="ch${i}" onclick="ansChoice(${i})"><span class="choice-num">${labs[i]}</span>${c}</button>`).join('')}
+      </div>`;
+  } else if(q.type==='input'){
+    qHTML=`
+      <div class="q-card" data-word="${q.answer}">
+        <div class="q-label">日本語を見て英単語を書こう</div>
+        <div class="q-main">${q.prompt}</div>
+        <div class="q-hint">ヒント：最初の文字は「<span>${q.hint.toUpperCase()}</span>」</div>
+      </div>
+      <div class="input-wrap">
+        <input class="ans-input" id="ansInput" placeholder="英語でスペルを入力…" autocomplete="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')submitInput()">
+        <button class="submit-btn" id="submitBtn" onclick="submitInput()">⚔️ 答える！</button>
+      </div>`;
+  } else {
+    qHTML=`
+      <div class="q-card" data-word="${q.wordHint}">
+        <div class="q-label">日本語文を英語にしよう</div>
+        <div class="q-main">${q.prompt}</div>
+        <div class="q-hint">キーワード：<span>${q.wordHint}</span>　語数：${q.answer.split(' ').length}語</div>
+      </div>
+      <div class="input-wrap">
+        <textarea class="sentence-input" id="ansInput" placeholder="英文を入力…" rows="3"></textarea>
+        <button class="submit-btn st3" id="submitBtn" onclick="submitSentence()">⚔️ 答える！</button>
+      </div>`;
+  }
+  document.getElementById('questInner').innerHTML=`
+    <div class="stage-banner">
+      <span class="stage-badge ${stC[q.stage]}">${stL[q.stage]}</span>
+      <span class="combo-display">${comboTxt}</span>
+      <span class="q-counter">${prog}</span>
+    </div>
+    ${qHTML}
+    <div class="feedback-bar" id="fbBar"><div class="fb-icon" id="fbIcon"></div><div class="fb-body"><div id="fbText"></div><div class="fb-answer" id="fbAnswer"></div><div id="fbSub"></div></div></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">次へ ▶</button>`;
+  const inp=document.getElementById('ansInput');
+  if(inp) setTimeout(()=>inp.focus(),80);
+}
+
+function ansChoice(i){
+  if(QS.answered)return;
+  QS.answered=true;
+  const q=currentQ();
+  const ok=q.choices[i]===q.answer;
+  document.querySelectorAll('.choice-btn').forEach((btn,idx)=>{
+    btn.disabled=true;
+    if(q.choices[idx]===q.answer) btn.classList.add('correct');
+    else if(idx===i&&!ok) btn.classList.add('wrong');
+  });
+  processAns(ok,q);
+}
+
+function submitInput(){
+  if(QS.answered)return;
+  const inp=document.getElementById('ansInput');
+  if(!inp||!inp.value.trim())return;
+  QS.answered=true;
+  const q=currentQ();
+  const ok=inp.value.trim().toLowerCase()===q.answer.toLowerCase();
+  inp.disabled=true;
+  document.getElementById('submitBtn').disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  processAns(ok,q);
+}
+
+function submitSentence(){
+  if(QS.answered)return;
+  const inp=document.getElementById('ansInput');
+  if(!inp||!inp.value.trim())return;
+  QS.answered=true;
+  const q=currentQ();
+  const user=inp.value.trim().toLowerCase();
+  const ans=q.answer.toLowerCase();
+  const hasKW=user.includes(q.wordHint.toLowerCase());
+  const ok=user===ans||(hasKW&&Math.abs(user.split(' ').length-ans.split(' ').length)<=1);
+  inp.disabled=true;
+  document.getElementById('submitBtn').disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  processAns(ok,q);
+}
+
+function processAns(ok,q){
+  QS.total++; G.totalQ++; G.todayQ++;
+  if(ok){
+    QS.correct++; QS.combo++; QS.maxCombo=Math.max(QS.maxCombo,QS.combo);
+    G.totalOk++; G.todayOk++;
+    const bonus=Math.min(QS.combo-1,5)*3;
+    const exp=q.exp+bonus;
+    QS.sessionExp+=exp; G.score+=exp*5;
+    G.words[q.wi].correct++;
+    if(G.words[q.wi].stageReached<=q.stage) G.words[q.wi].stageReached=q.stage+1;
+    gainExp(exp);
+    document.getElementById('fbIcon').textContent='✨';
+    document.getElementById('fbText').textContent=`正解！${QS.combo>1?` ${QS.combo}コンボ！`:''}`;
+    document.getElementById('fbAnswer').textContent=`答え：${q.answer}`;
+    document.getElementById('fbSub').innerHTML=`<span class="fb-exp">+${exp} EXP${bonus>0?` (コンボ+${bonus})`:''}`;
+    document.getElementById('fbBar').className='feedback-bar show ok';
+  } else {
+    QS.combo=0;
+    QS.retryQueue.push(makeQ(q.wi,q.stage));
+    if(!QS.wrongWords.find(w=>w.wi===q.wi)) QS.wrongWords.push({wi:q.wi,ans:q.answer});
+    document.getElementById('fbIcon').textContent='💔';
+    document.getElementById('fbText').textContent='惜しい！後でもう一度出てくるよ';
+    document.getElementById('fbAnswer').textContent=`正解：${q.answer}`;
+    document.getElementById('fbSub').innerHTML=`<span class="fb-retry">この単語は後で再挑戦！</span>`;
+    document.getElementById('fbBar').className='feedback-bar show ng';
+  }
+  G.words[q.wi].attempts++;
+  document.getElementById('nextBtn').classList.add('show');
+  updateHeader(); updateMissions(); updateWordDots();
+}
+
+function nextQ(){
+  if(QS.idx<QS.qs.length){
+    QS.idx++;
+    if(QS.idx===QS.qs.length&&QS.retryQueue.length===0) completedRound();
+  } else if(QS.retryQueue.length>0){
+    QS.retryQueue.shift();
+    if(QS.retryQueue.length===0) completedRound();
+  }
+  renderQ();
+}
+
+function completedRound(){
+  G.totalRounds++; G.todayRounds++;
+  updateMissions();
+  showToast(`🎉 ${G.totalRounds}周目クリア！`);
+}
+
+function renderResult(){
+  const acc=QS.total>0?Math.round(QS.correct/QS.total*100):0;
+  const stN=['Stage 1','Stage 2','Stage 3'];
+  const wrongHTML=QS.wrongWords.length>0?`
+    <div class="wrong-list">
+      <div class="wrong-list-title">⚠️ 間違えた単語（${QS.wrongWords.length}語）</div>
+      ${QS.wrongWords.map(w=>`<div class="wrong-item"><span class="wrong-en">${WORDS[w.wi].en}</span><span class="wrong-ja">${WORDS[w.wi].ja}</span></div>`).join('')}
+    </div>`:'<div style="color:var(--green);font-weight:700;text-align:center;padding:12px;margin-bottom:14px">🎉 全問正解！完璧です！</div>';
+  document.getElementById('questInner').innerHTML=`
+    <div class="result-wrap">
+      <div class="result-icon">${acc>=80?'🏆':acc>=60?'⭐':'💪'}</div>
+      <div class="result-title">クエスト完了！</div>
+      <div class="result-round">${stN[G.selectedStage]}・累計${G.totalRounds}周</div>
+      <div class="result-big">${QS.correct} <span style="font-size:1.5rem;color:var(--muted)">/ ${QS.total}</span></div>
+      <div class="result-acc">正解率 ${acc}%</div>
+      <div class="result-grid">
+        <div class="result-cell"><div class="result-cell-val">${QS.sessionExp}</div><div class="result-cell-label">獲得EXP</div></div>
+        <div class="result-cell"><div class="result-cell-val">${QS.maxCombo}</div><div class="result-cell-label">最大コンボ</div></div>
+        <div class="result-cell"><div class="result-cell-val">${G.totalRounds}</div><div class="result-cell-label">累計周回</div></div>
+        <div class="result-cell"><div class="result-cell-val">Lv.${G.lv}</div><div class="result-cell-label">現在レベル</div></div>
+      </div>
+      ${wrongHTML}
+      <div class="action-btns">
+        <button class="action-btn primary" onclick="startQuest()">⚔️ もう一周！</button>
+        <button class="action-btn secondary" onclick="switchTab('home')">🏠 ホームへ</button>
+      </div>
+    </div>`;
+}
+
+function gainExp(amount){
+  G.exp+=amount;
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  if(G.exp>=need){ G.exp-=need; G.lv++; updateStageLocks(); showLU(); }
+  updateHeader();
+}
+
+function showLU(){
+  const t=getTitle();
+  document.getElementById('luLv').textContent='Lv.'+G.lv;
+  document.getElementById('luTitle').textContent=`称号：${t.icon} ${t.name}`;
+  document.getElementById('luOverlay').classList.add('show');
+}
+function closeLu(){ document.getElementById('luOverlay').classList.remove('show'); }
+function getTitle(){ let t=TITLES[0]; for(const tt of TITLES) if(G.lv>=tt.lv) t=tt; return t; }
+
+function updateHeader(){
+  const t=getTitle();
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  const pct=Math.min(G.exp/need*100,100);
+  document.getElementById('expFill').style.width=pct+'%';
+  document.getElementById('hExpLabel').textContent=`EXP ${G.exp}/${need}`;
+  document.getElementById('hTitleLabel').textContent=t.name;
+  document.getElementById('scoreBadge').textContent='💎 '+G.score+'pt';
+  document.getElementById('streakBadge').textContent='🔥 '+G.streak+'日';
+  const av=AVATARS[Math.min(G.lv-1,AVATARS.length-1)];
+  document.getElementById('heroAvatar').textContent=av;
+  document.getElementById('heroLv').textContent=G.lv;
+  document.getElementById('heroTitleBadge').textContent=t.icon+' '+t.name;
+  document.getElementById('todayQNum').textContent=G.todayQ;
+  document.getElementById('todayAccNum').textContent=G.todayQ>0?Math.round(G.todayOk/G.todayQ*100)+'%':'－';
+  document.getElementById('todayRoundsNum').textContent=G.todayRounds;
+}
+
+function updateMissions(){
+  const q=Math.min(G.todayQ,30);
+  document.getElementById('mc1bar').style.width=(q/30*100)+'%';
+  document.getElementById('mc1sub').textContent=`${G.todayQ} / 30 問`;
+  if(G.todayQ>=30){document.getElementById('mc1check').textContent='✅';document.getElementById('mc1').classList.add('done');}
+  const acc=G.todayQ>0?Math.round(G.todayOk/G.todayQ*100):0;
+  document.getElementById('mc2bar').style.width=Math.min(acc,100)+'%';
+  document.getElementById('mc2sub').textContent=`正解率 ${acc}%`;
+  if(acc>=80&&G.todayQ>=10){document.getElementById('mc2check').textContent='✅';document.getElementById('mc2').classList.add('done');}
+  const r=Math.min(G.todayRounds,2);
+  document.getElementById('mc3bar').style.width=(r/2*100)+'%';
+  document.getElementById('mc3sub').textContent=`${G.todayRounds} / 2 周`;
+  if(G.todayRounds>=2){document.getElementById('mc3check').textContent='✅';document.getElementById('mc3').classList.add('done');}
+}
+
+function updateWordDots(){
+  const grid=document.getElementById('wordDots');
+  if(!grid)return;
+  grid.innerHTML=WORDS.map((w,i)=>{
+    const wd=G.words[i];
+    const cls=wd.stageReached>=4?'mastered':wd.stageReached===3?'st3':wd.stageReached===2?'st2':wd.stageReached>=1?'st1':'';
+    const acc=wd.attempts>0?Math.round(wd.correct/wd.attempts*100):0;
+    return `<div class="word-dot ${cls}" title="${w.en}: ${w.ja}">${acc>0?acc+'%':''}</div>`;
+  }).join('');
+}
+
+function renderWordTable(){
+  const stL=['未','ST1','ST2','ST3','✨'];
+  const stC=['s0','s1','s2','s3','sm'];
+  document.getElementById('wordTableBody').innerHTML=WORDS.map((w,i)=>{
+    const wd=G.words[i];
+    const acc=wd.attempts>0?Math.round(wd.correct/wd.attempts*100)+'%':'－';
+    const st=Math.min(wd.stageReached,4);
+    return `<tr><td class="wt-en">${w.en}</td><td>${w.ja}</td><td><span class="wt-stage ${stC[st]}">${stL[st]}</span></td><td class="wt-acc">${acc}</td></tr>`;
+  }).join('');
+}
+
+function renderStatus(){
+  const t=getTitle();
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  const pct=Math.min(G.exp/need*100,100);
+  document.getElementById('stAvatar').textContent=AVATARS[Math.min(G.lv-1,AVATARS.length-1)];
+  document.getElementById('stLv').textContent=G.lv;
+  document.getElementById('stTitle').textContent=t.icon+' '+t.name;
+  document.getElementById('stExpFill').style.width=pct+'%';
+  document.getElementById('stExpLabel').textContent=`EXP: ${G.exp} / ${need}`;
+  document.getElementById('stScore').textContent=G.score;
+  document.getElementById('stTotal').textContent=G.totalQ;
+  document.getElementById('stCorrect').textContent=G.totalOk;
+  document.getElementById('stRounds').textContent=G.totalRounds;
+  document.getElementById('titleRows').innerHTML=TITLES.map(tt=>`
+    <div class="title-row ${G.lv>=tt.lv?'unlocked':'locked'}">
+      <div class="tr-icon">${tt.icon}</div>
+      <div class="tr-body"><div class="tr-name">${tt.name}</div><div class="tr-cond">${tt.cond}</div></div>
+      <div class="tr-badge ${G.lv>=tt.lv?'u':'l'}">${G.lv>=tt.lv?'獲得済み':'未解放'}</div>
+    </div>`).join('');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+updateHeader(); updateMissions(); updateWordDots(); updateStageLocks();
+</script>
+</body>
+</html>
