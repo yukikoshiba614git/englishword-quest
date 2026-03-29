@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九州の雑学 – 自然環境編</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #E8621A;
+    --orange-light: #F5905A;
+    --cream: #FDF6EC;
+    --brown: #3D1F0A;
+    --brown-light: #7A4520;
+    --gold: #D4A017;
+    --green: #2D6A4F;
+    --sky: #5BA4CF;
+    --card-bg: #FFFDF8;
+    --shadow: 0 8px 40px rgba(61,31,10,0.13);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    background: var(--cream);
+    color: var(--brown);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === HEADER === */
+  .header {
+    background: linear-gradient(135deg, var(--orange) 0%, #C0440E 100%);
+    color: white;
+    padding: 20px 24px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 160px; height: 160px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .header-sub { font-size: 11px; opacity: 0.8; letter-spacing: 2px; margin-bottom: 4px; }
+  .header-title { font-size: 22px; font-weight: 900; }
+  .header-stage { 
+    display: inline-block;
+    margin-top: 8px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* === PROGRESS === */
+  .progress-bar-wrap {
+    background: white;
+    padding: 12px 24px;
+    border-bottom: 1px solid #EDE0D0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-label { font-size: 12px; color: var(--brown-light); font-weight: 700; white-space: nowrap; }
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: #EDE0D0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--gold));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .progress-count { font-size: 12px; font-weight: 900; color: var(--orange); white-space: nowrap; }
+
+  /* === MAIN CONTAINER === */
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+  }
+
+  /* === CARD === */
+  .card {
+    background: var(--card-bg);
+    margin: 20px 16px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: none;
+    animation: slideIn 0.4s cubic-bezier(0.22,1,0.36,1);
+  }
+  .card.active { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === IMAGE AREA === */
+  .card-image {
+    position: relative;
+    height: 200px;
+    background: #D4C5B0;
+    overflow: hidden;
+  }
+  .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-image .img-loading {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    background: linear-gradient(135deg, #E8D5BC, #D4C5A0);
+    color: var(--brown-light);
+    font-size: 13px;
+  }
+  .img-loading .spinner {
+    width: 28px; height: 28px;
+    border: 3px solid rgba(122,69,32,0.2);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .card-image-caption {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    color: white;
+    font-size: 11px;
+    padding: 20px 12px 8px;
+    font-weight: 500;
+  }
+
+  /* === CARD NUMBER BADGE === */
+  .card-number {
+    position: absolute;
+    top: 12px; left: 12px;
+    background: var(--orange);
+    color: white;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* === CARD BODY === */
+  .card-body { padding: 20px 20px 4px; }
+
+  .card-hook {
+    font-size: 17px;
+    font-weight: 900;
+    line-height: 1.5;
+    color: var(--brown);
+    margin-bottom: 14px;
+    position: relative;
+    padding-left: 14px;
+  }
+  .card-hook::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 4px;
+    width: 4px; height: calc(100% - 8px);
+    background: var(--orange);
+    border-radius: 2px;
+  }
+
+  .card-story {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    line-height: 1.85;
+    color: #4A2E12;
+  }
+  .card-story p { margin-bottom: 10px; }
+
+  /* === REALITY BOX === */
+  .reality-box {
+    margin: 16px 20px;
+    background: linear-gradient(135deg, #FFF8E8, #FFF3D4);
+    border: 1.5px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .reality-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .reality-content {}
+  .reality-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .reality-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--brown);
+  }
+
+  /* === TERM BOX === */
+  .term-box {
+    margin: 0 20px 20px;
+    background: #F0F7F4;
+    border-left: 4px solid var(--green);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 14px;
+  }
+  .term-label {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .term-list { list-style: none; }
+  .term-list li {
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 3px 0;
+    color: var(--brown);
+  }
+  .term-list li strong {
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  /* === NAV BUTTONS === */
+  .nav-area {
+    padding: 4px 16px 16px;
+    display: flex;
+    gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:active { transform: scale(0.96); }
+
+  .btn-prev {
+    background: white;
+    color: var(--brown-light);
+    border: 2px solid #DDD0C0;
+    flex: 0.6;
+  }
+  .btn-next {
+    background: linear-gradient(135deg, var(--orange), #C0440E);
+    color: white;
+    box-shadow: 0 4px 16px rgba(232,98,26,0.4);
+  }
+  .btn-next:hover { box-shadow: 0 6px 20px rgba(232,98,26,0.5); }
+  .btn-finish {
+    background: linear-gradient(135deg, var(--gold), #B8860B);
+    color: white;
+    box-shadow: 0 4px 16px rgba(212,160,23,0.4);
+  }
+
+  /* === COMPLETE SCREEN === */
+  .complete-screen {
+    display: none;
+    margin: 20px 16px;
+    text-align: center;
+    padding: 40px 24px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.5s ease;
+  }
+  .complete-screen.active { display: block; }
+  .complete-emoji { font-size: 60px; margin-bottom: 16px; }
+  .complete-title { font-size: 22px; font-weight: 900; color: var(--orange); margin-bottom: 8px; }
+  .complete-sub { font-size: 14px; color: var(--brown-light); line-height: 1.7; margin-bottom: 28px; }
+  .complete-stars { font-size: 32px; letter-spacing: 4px; margin-bottom: 24px; }
+  .btn-restart {
+    display: inline-block;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, var(--orange), #C0440E);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(232,98,26,0.4);
+  }
+
+  /* === DOT INDICATORS === */
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0 0;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #DDD0C0;
+    transition: all 0.3s;
+  }
+  .dot.active {
+    background: var(--orange);
+    width: 24px;
+    border-radius: 4px;
+  }
+  .dot.done { background: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-sub">九州地方 · 自然環境</div>
+  <div class="header-title">🌋 九州ってどんなとこ？</div>
+  <div class="header-stage">ステージ① 雑学3選</div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-label">読んだ雑学</div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+  <div class="progress-count" id="progressCount">0 / 3</div>
+</div>
+
+<div class="container">
+
+  <!-- DOTS -->
+  <div class="dots" id="dots">
+    <div class="dot active" data-i="0"></div>
+    <div class="dot" data-i="1"></div>
+    <div class="dot" data-i="2"></div>
+  </div>
+
+  <!-- === CARD 1 === -->
+  <div class="card active" id="card-0">
+    <div class="card-image" id="img-wrap-0">
+      <div class="img-loading" id="img-loading-0">
+        <div class="spinner"></div>
+        <span>画像を読み込み中...</span>
+      </div>
+      <img id="img-0" style="display:none" alt="阿蘇山">
+      <div class="card-image-caption" id="img-caption-0"></div>
+      <div class="card-number">雑学 01</div>
+    </div>
+    <div class="card-body">
+      <div class="card-hook">世界最大級のカルデラが、九州のど真ん中にある</div>
+      <div class="card-story">
+        <p>熊本県にある<strong>阿蘇山</strong>。その外輪山が囲む「阿蘇カルデラ」は、東西約18km・南北約25kmという巨大なくぼ地だ。</p>
+        <p>約9万年前の超巨大噴火で生まれたこのカルデラの中に、今も約5万人が暮らしている。畑があり、鉄道が走り、普通の町がある。「火山の中に人が住む」という、世界でも珍しい場所だ。</p>
+        <p>現在も<strong>中岳</strong>は活発に噴火を繰り返しており、火山ガスで立入禁止になることも多い。九州が「火の国」と呼ばれる理由がここにある。</p>
+      </div>
+    </div>
+    <div class="reality-box">
+      <div class="reality-icon">📏</div>
+      <div class="reality-content">
+        <div class="reality-label">リアリティ DATA</div>
+        <div class="reality-text">阿蘇カルデラの面積は約380km²。東京23区（619km²）の約6割に相当する広さ。その中に「阿蘇市」という市が丸ごと入っている。</div>
+      </div>
+    </div>
+    <div class="term-box">
+      <div class="term-label">用語解説</div>
+      <ul class="term-list">
+        <li><strong>カルデラ</strong>：火山が大噴火した後、地面が陥没してできた大きなくぼ地のこと</li>
+        <li><strong>外輪山</strong>：カルデラの外側をぐるりと囲む山々のこと</li>
+      </ul>
+    </div>
+    <div class="nav-area">
+      <button class="btn btn-next" onclick="goTo(1)">次の雑学へ →</button>
+    </div>
+  </div>
+
+  <!-- === CARD 2 === -->
+  <div class="card" id="card-1">
+    <div class="card-image" id="img-wrap-1">
+      <div class="img-loading" id="img-loading-1">
+        <div class="spinner"></div>
+        <span>画像を読み込み中...</span>
+      </div>
+      <img id="img-1" style="display:none" alt="桜島">
+      <div class="card-image-caption" id="img-caption-1"></div>
+      <div class="card-number">雑学 02</div>
+    </div>
+    <div class="card-body">
+      <div class="card-hook">「島」なのに、実は半島。桜島はなぜ島ではないのか？</div>
+      <div class="card-story">
+        <p>鹿児島湾に浮かぶ<strong>桜島</strong>は、その名の通りかつて本当に「島」だった。ところが1914年（大正3年）の大噴火で大量の溶岩が流れ出し、対岸の大隅半島と陸続きになってしまった。</p>
+        <p>この噴火は史上最大規模のもので、噴出した溶岩の量は約30億トン。わずか数日で海峡を埋め尽くし、島は半島になった。</p>
+        <p>現在も桜島は活発に噴火を続けており、鹿児島市には<strong>降灰</strong>（火山灰が降ること）が日常的に起こる。学校に「灰捨て場」があるのは鹿児島ならではの光景だ。</p>
+      </div>
+    </div>
+    <div class="reality-box">
+      <div class="reality-icon">🌋</div>
+      <div class="reality-content">
+        <div class="reality-label">リアリティ DATA</div>
+        <div class="reality-text">桜島は年間1,000回前後噴火することもある「世界有数の活火山」。鹿児島市民は傘の代わりに「灰用マスク」と「灰落とし用のほうき」を常備している。</div>
+      </div>
+    </div>
+    <div class="term-box">
+      <div class="term-label">用語解説</div>
+      <ul class="term-list">
+        <li><strong>活火山</strong>：現在も噴火活動を続けている、または過去1万年以内に噴火した火山</li>
+        <li><strong>降灰</strong>：火山灰が空から降り積もる現象。農作物や交通機関に影響を与える</li>
+      </ul>
+    </div>
+    <div class="nav-area">
+      <button class="btn btn-prev" onclick="goTo(0)">← 前へ</button>
+      <button class="btn btn-next" onclick="goTo(2)">次の雑学へ →</button>
+    </div>
+  </div>
+
+  <!-- === CARD 3 === -->
+  <div class="card" id="card-2">
+    <div class="card-image" id="img-wrap-2">
+      <div class="img-loading" id="img-loading-2">
+        <div class="spinner"></div>
+        <span>画像を読み込み中...</span>
+      </div>
+      <img id="img-2" style="display:none" alt="九州の温泉">
+      <div class="card-image-caption" id="img-caption-2"></div>
+      <div class="card-number">雑学 03</div>
+    </div>
+    <div class="card-body">
+      <div class="card-hook">なぜ九州は日本一の温泉大国なのか？</div>
+      <div class="card-story">
+        <p>日本の温泉源泉数ランキングで、1位は大分県、2位は鹿児島県、3位は北海道。九州の2県だけで全国の源泉の約25%を占める。</p>
+        <p>この理由はシンプルで、九州が「火山の島」だからだ。阿蘇山・桜島・雲仙岳など活火山が集中しており、地下のマグマが地下水を温めて温泉になる。</p>
+        <p>大分県<strong>別府温泉</strong>は源泉数・湧出量ともに日本一で、「地獄めぐり」として観光地化された池では、血のように赤い「血の池地獄」や、間欠泉のように熱泥が噴き出す「龍巻地獄」など、火山の力を直接体感できる。</p>
+      </div>
+    </div>
+    <div class="reality-box">
+      <div class="reality-icon">♨️</div>
+      <div class="reality-content">
+        <div class="reality-label">リアリティ DATA</div>
+        <div class="reality-text">別府温泉の1日あたりの湧出量は約13万キロリットル。これは1日でオリンピックプールを約52杯分を満たせる量。日本全国の温泉湧出量の約10分の1が別府一か所から出ている。</div>
+      </div>
+    </div>
+    <div class="term-box">
+      <div class="term-label">用語解説</div>
+      <ul class="term-list">
+        <li><strong>源泉</strong>：温泉が地中から湧き出している場所・穴のこと</li>
+        <li><strong>間欠泉</strong>：一定の間隔をおいて熱湯や蒸気を噴き出す温泉</li>
+      </ul>
+    </div>
+    <div class="nav-area">
+      <button class="btn btn-prev" onclick="goTo(1)">← 前へ</button>
+      <button class="btn btn-finish" onclick="showComplete()">✨ 読み終えた！</button>
+    </div>
+  </div>
+
+  <!-- === COMPLETE === -->
+  <div class="complete-screen" id="completeScreen">
+    <div class="complete-emoji">🎉</div>
+    <div class="complete-stars">⭐⭐⭐</div>
+    <div class="complete-title">雑学コンプリート！</div>
+    <div class="complete-sub">
+      九州の自然環境について<br>3つの雑学を読んだよ！<br><br>
+      阿蘇のカルデラ・桜島・別府温泉…<br>全部つながってるってわかった？<br>
+      <strong>九州は火山の力で動いている島なんだ。</strong>
+    </div>
+    <button class="btn-restart" onclick="restart()">もう一度読む 🔄</button>
+  </div>
+
+</div>
+
+<script>
+  const IMAGES = [
+    { keyword: "熊本県", caption: "阿蘇山・熊本県 © Wikipedia" },
+    { keyword: "鹿児島県", caption: "桜島・鹿児島県 © Wikipedia" },
+    { keyword: "大分県", caption: "別府温泉・大分県 © Wikipedia" }
+  ];
+
+  async function loadImage(index) {
+    const data = IMAGES[index];
+    const img = document.getElementById('img-' + index);
+    const loading = document.getElementById('img-loading-' + index);
+    const caption = document.getElementById('img-caption-' + index);
+    caption.textContent = data.caption;
+    try {
+      const res = await fetch(
+        `https://ja.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(data.keyword)}&prop=pageimages&format=json&pithumbsize=640&origin=*`
+      );
+      const json = await res.json();
+      const pages = json.query.pages;
+      const page = Object.values(pages)[0];
+      if (page.thumbnail && page.thumbnail.source) {
+        img.src = page.thumbnail.source;
+        img.onload = () => { loading.style.display = 'none'; img.style.display = 'block'; };
+        img.onerror = () => { loading.innerHTML = '<span style="font-size:48px">🌋</span>'; };
+        return;
+      }
+    } catch(e) {}
+    loading.innerHTML = '<span style="font-size:48px">🌋</span>';
+  }
+
+  let current = 0;
+  const total = 3;
+
+  function goTo(index) {
+    document.getElementById('card-' + current).classList.remove('active');
+    current = index;
+    document.getElementById('card-' + current).classList.add('active');
+    updateProgress();
+    updateDots();
+    const img = document.getElementById('img-' + current);
+    if (!img.src || img.style.display === 'none') {
+      loadImage(current);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress() {
+    const pct = Math.round(((current + 1) / total) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressCount').textContent = (current + 1) + ' / ' + total;
+  }
+
+  function updateDots() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.remove('active', 'done');
+      if (i === current) d.classList.add('active');
+      else if (i < current) d.classList.add('done');
+    });
+  }
+
+  function showComplete() {
+    document.getElementById('card-2').classList.remove('active');
+    document.getElementById('completeScreen').classList.add('active');
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressCount').textContent = '3 / 3';
+    document.querySelectorAll('.dot').forEach(d => { d.classList.remove('active'); d.classList.add('done'); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function restart() {
+    document.getElementById('completeScreen').classList.remove('active');
+    current = 0;
+    document.getElementById('card-0').classList.add('active');
+    updateProgress();
+    updateDots();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Load first image on start
+  loadImage(0);
+</script>
+</body>
+</html>
