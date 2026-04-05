@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quest 中1 ✨ 英単語の冒険</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1628;
+  --panel: #162040;
+  --panel2: #1e2d55;
+  --border: #2a3f7a;
+  --gold: #ffd166;
+  --gold2: #f4a261;
+  --blue: #4cc9f0;
+  --green: #06d6a0;
+  --red: #ef476f;
+  --text: #e8edf8;
+  --muted: #6b7db3;
+  --st1-color: #4cc9f0;
+  --st2-color: #06d6a0;
+  --st3-color: #f4a261;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(76,201,240,0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 85%, rgba(244,162,97,0.07) 0%, transparent 50%);
+  pointer-events: none; z-index: 0;
+}
+.stars-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: var(--o); } to { opacity: calc(var(--o)*0.15); } }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+@keyframes pop { from{transform:scale(0.6);opacity:0} to{transform:scale(1);opacity:1} }
+
+#app { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding-bottom: 72px; }
+
+/* GATEWAY LINK */
+.gateway-bar {
+  background: linear-gradient(90deg, #080e1e, #0e1628);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gateway-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color .2s;
+}
+.gateway-link:hover { color: var(--gold); }
+.grade-badge {
+  margin-left: auto;
+  padding: 3px 12px;
+  background: rgba(76,201,240,0.15);
+  border: 1px solid var(--st1-color);
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--st1-color);
+}
+
+/* HEADER */
+header {
+  background: linear-gradient(180deg, #080e1e 0%, var(--panel) 100%);
+  border-bottom: 2px solid var(--border);
+  padding: 12px 16px 10px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+.h-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.logo { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--gold); letter-spacing: 1px; }
+.logo em { color: var(--blue); font-style: normal; }
+.logo span { font-size: 0.85rem; color: var(--muted); margin-left: 6px; }
+.h-badges { display: flex; gap: 8px; }
+.badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; background: var(--panel2); border: 1px solid var(--border); color: var(--gold); }
+.badge.fire { background: linear-gradient(135deg,#c0392b,#e74c3c); border: none; color: #fff; }
+.exp-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--muted); margin-bottom: 4px; }
+.exp-track { height: 8px; background: var(--panel2); border-radius: 8px; overflow: hidden; border: 1px solid rgba(76,201,240,0.15); }
+.exp-fill { height: 100%; background: linear-gradient(90deg, #4cc9f0, #7b2d8b, var(--gold)); border-radius: 8px; transition: width .6s cubic-bezier(.22,1,.36,1); box-shadow: 0 0 8px rgba(76,201,240,0.5); }
+
+/* TABS */
+.tabs { display: flex; background: var(--panel); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.tab { flex: 1; padding: 11px 4px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; transition: all .2s; }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); background: rgba(76,201,240,0.04); }
+
+/* CONTENT */
+.content { padding: 18px 16px; }
+
+/* HOME */
+.hero-card {
+  background: linear-gradient(135deg, var(--panel) 0%, #1a2a50 100%);
+  border: 1px solid var(--border); border-radius: 18px; padding: 20px; text-align: center; margin-bottom: 18px;
+  position: relative; overflow: hidden;
+}
+.hero-card::after { content: ''; position: absolute; top: -40px; right: -40px; width: 140px; height: 140px; background: radial-gradient(circle, rgba(76,201,240,0.12), transparent); border-radius: 50%; pointer-events: none; }
+.hero-avatar { font-size: 3.8rem; display: block; margin-bottom: 8px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(76,201,240,0.5)); }
+.hero-lv { font-family: 'Fredoka One', cursive; font-size: 2.4rem; color: var(--gold); line-height: 1; text-shadow: 0 0 16px rgba(255,209,102,0.5); }
+.hero-lv-label { font-size: 0.68rem; color: var(--muted); }
+.hero-title-badge { display: inline-block; margin-top: 6px; padding: 3px 12px; background: var(--panel2); border: 1px solid var(--border); border-radius: 20px; font-size: 0.78rem; color: var(--blue); font-weight: 700; }
+
+.section-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
+
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.stat-mini { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; }
+.stat-mini-val { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold); }
+.stat-mini-label { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
+
+.mission-card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+.mission-card.done { border-color: var(--green); opacity: 0.7; }
+.mc-icon { font-size: 1.3rem; flex-shrink: 0; }
+.mc-body { flex: 1; }
+.mc-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 3px; }
+.mc-bar-track { height: 4px; background: var(--panel2); border-radius: 4px; overflow: hidden; }
+.mc-bar-fill { height: 100%; background: var(--green); border-radius: 4px; transition: width .5s; }
+.mc-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+.mc-check { font-size: 1.1rem; flex-shrink: 0; }
+
+.stage-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+.stage-card { background: var(--panel); border: 2px solid transparent; border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; position: relative; }
+.stage-card.locked { opacity: 0.45; cursor: default; }
+.stage-card.sel { border-color: var(--blue); background: rgba(76,201,240,0.07); }
+.stage-card:hover:not(.locked):not(.sel) { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+.stage-icon { font-size: 1.8rem; margin-bottom: 5px; }
+.stage-name { font-size: 0.72rem; font-weight: 700; margin-bottom: 3px; }
+.stage-desc { font-size: 0.62rem; color: var(--muted); line-height: 1.4; }
+.stage-unlock { font-size: 0.6rem; color: var(--gold); margin-top: 4px; }
+.stage-pip { position: absolute; top: 5px; right: 7px; font-size: 0.58rem; color: var(--muted); }
+
+.word-progress-grid { display: grid; grid-template-columns: repeat(9,1fr); gap: 4px; margin-bottom: 18px; }
+.word-dot { aspect-ratio: 1; border-radius: 5px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.42rem; font-weight: 700; background: var(--panel2); color: var(--muted); transition: all .3s; }
+.word-dot.st1 { background: rgba(76,201,240,0.2); border-color: var(--st1-color); color: var(--st1-color); }
+.word-dot.st2 { background: rgba(6,214,160,0.2); border-color: var(--st2-color); color: var(--st2-color); }
+.word-dot.st3 { background: rgba(244,162,97,0.2); border-color: var(--st3-color); color: var(--st3-color); }
+.word-dot.mastered { background: rgba(255,209,102,0.2); border-color: var(--gold); color: var(--gold); }
+
+.word-count-info { font-size: 0.72rem; color: var(--muted); text-align: center; margin-bottom: 8px; }
+.word-count-info span { color: var(--gold); font-weight: 700; }
+
+.start-btn { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, #4361ee, #7b2d8b); border: none; border-radius: 14px; color: #fff; font-family: 'Noto Sans JP', sans-serif; font-size: 1.05rem; font-weight: 900; cursor: pointer; margin-top: 18px; letter-spacing: 1px; box-shadow: 0 4px 20px rgba(67,97,238,0.4); transition: all .2s; }
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(67,97,238,0.6); }
+
+/* QUEST */
+.stage-banner { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.stage-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+.stage-badge.s1 { background: rgba(76,201,240,0.15); color: var(--st1-color); border: 1px solid var(--st1-color); }
+.stage-badge.s2 { background: rgba(6,214,160,0.15); color: var(--st2-color); border: 1px solid var(--st2-color); }
+.stage-badge.s3 { background: rgba(244,162,97,0.15); color: var(--st3-color); border: 1px solid var(--st3-color); }
+.q-counter { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+.combo-display { font-size: 0.75rem; color: var(--gold); font-weight: 700; }
+
+.q-card { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 22px 18px; margin: 14px 16px; min-height: 100px; position: relative; overflow: hidden; }
+.q-card::before { content: attr(data-word); position: absolute; right: -10px; bottom: -20px; font-size: 4.5rem; opacity: 0.04; font-family: 'Fredoka One', cursive; pointer-events: none; white-space: nowrap; }
+.q-label { font-size: 0.65rem; color: var(--muted); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+.q-main { font-size: 1.35rem; font-weight: 900; line-height: 1.4; color: #fff; }
+.q-main.english { font-family: 'Fredoka One', cursive; color: var(--blue); font-size: 2rem; letter-spacing: 1px; }
+.q-hint { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+.q-hint span { color: var(--gold); font-family: 'Fredoka One', cursive; letter-spacing: 2px; }
+
+.choices-wrap { padding: 0 16px; display: flex; flex-direction: column; gap: 9px; margin-bottom: 12px; }
+.choice-btn { background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 13px 15px; color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 0.88rem; font-weight: 700; text-align: left; cursor: pointer; transition: all .18s; display: flex; align-items: center; gap: 10px; }
+.choice-btn:hover:not(:disabled) { border-color: rgba(76,201,240,0.5); background: rgba(76,201,240,0.05); transform: translateX(4px); }
+.choice-btn.correct { border-color: var(--green); background: rgba(6,214,160,0.1); color: var(--green); }
+.choice-btn.wrong { border-color: var(--red); background: rgba(239,71,111,0.1); color: #ff8fa3; }
+.choice-num { width: 26px; height: 26px; border-radius: 50%; background: var(--panel2); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; flex-shrink: 0; }
+
+.input-wrap { padding: 0 16px; margin-bottom: 12px; }
+.ans-input { width: 100%; background: var(--panel); border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; color: #fff; font-family: 'Fredoka One', cursive; font-size: 1.3rem; letter-spacing: 2px; outline: none; transition: border-color .2s; }
+.ans-input:focus { border-color: var(--st2-color); }
+.ans-input.correct { border-color: var(--green); }
+.ans-input.wrong { border-color: var(--red); }
+.ans-input::placeholder { font-family: 'Noto Sans JP',sans-serif; font-size: 0.9rem; letter-spacing: 0; color: var(--muted); }
+
+.submit-btn { width: 100%; padding: 13px; border: none; border-radius: 12px; color: #fff; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; margin-top: 8px; transition: all .2s; background: linear-gradient(135deg, #06d6a0, #028a60); }
+.submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.submit-btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+.feedback-bar { margin: 0 16px 12px; padding: 13px 15px; border-radius: 12px; display: none; gap: 11px; align-items: flex-start; }
+.feedback-bar.show { display: flex; }
+.feedback-bar.ok { background: rgba(6,214,160,0.1); border: 1px solid var(--green); }
+.feedback-bar.ng { background: rgba(239,71,111,0.08); border: 1px solid var(--red); }
+.fb-icon { font-size: 1.4rem; flex-shrink: 0; }
+.fb-body { font-size: 0.82rem; line-height: 1.6; }
+.fb-answer { font-weight: 700; color: var(--gold); font-family: 'Fredoka One', cursive; font-size: 0.95rem; }
+.fb-exp { font-size: 0.72rem; color: var(--green); font-weight: 700; }
+.fb-retry { font-size: 0.72rem; color: var(--red); font-weight: 700; }
+
+.next-btn { display: none; width: calc(100% - 32px); margin: 0 16px; padding: 14px; border: none; border-radius: 12px; color: #0a1020; font-family: 'Noto Sans JP',sans-serif; font-size: 1rem; font-weight: 900; cursor: pointer; transition: all .2s; letter-spacing: 1px; background: linear-gradient(135deg, var(--gold), var(--gold2)); }
+.next-btn.show { display: block; }
+.next-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255,209,102,0.4); }
+
+/* RESULT */
+.result-wrap { padding: 20px 16px; text-align: center; }
+.result-icon { font-size: 4rem; margin-bottom: 10px; animation: pop .4s cubic-bezier(.22,1,.36,1); }
+.result-title { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--gold); }
+.result-round { font-size: 0.78rem; color: var(--muted); margin: 4px 0 16px; }
+.result-big { font-family: 'Fredoka One', cursive; font-size: 3.5rem; color: #fff; line-height: 1; }
+.result-acc { font-size: 0.85rem; color: var(--muted); margin-top: 4px; margin-bottom: 20px; }
+.result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.result-cell { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.result-cell-val { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--gold); }
+.result-cell-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+.wrong-list { background: var(--panel); border: 1px solid var(--red); border-radius: 12px; padding: 14px; margin-bottom: 16px; text-align: left; }
+.wrong-list-title { font-size: 0.75rem; color: var(--red); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.wrong-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; }
+.wrong-item:last-child { border-bottom: none; }
+.wrong-en { font-family: 'Fredoka One', cursive; color: var(--blue); }
+.wrong-ja { color: var(--muted); }
+.action-btns { display: flex; flex-direction: column; gap: 10px; }
+.action-btn { padding: 14px; border: none; border-radius: 12px; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; transition: all .2s; }
+.action-btn.primary { background: linear-gradient(135deg,#4361ee,#7b2d8b); color: #fff; }
+.action-btn.secondary { background: var(--panel); border: 1px solid var(--border); color: var(--text); }
+.action-btn.gateway { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a1020; }
+.action-btn:hover { transform: translateY(-2px); }
+
+/* STATUS */
+.status-hero { background: linear-gradient(135deg, var(--panel), #1a2a50); border: 1px solid var(--border); border-radius: 18px; padding: 24px 18px; text-align: center; margin-bottom: 16px; }
+.status-avatar { font-size: 4rem; margin-bottom: 8px; filter: drop-shadow(0 0 16px rgba(76,201,240,0.5)); }
+.status-lv { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--gold); }
+.status-title { font-size: 0.85rem; color: var(--muted); margin: 4px 0 14px; }
+.status-expbar { height: 10px; background: var(--panel2); border-radius: 10px; overflow: hidden; border: 1px solid rgba(76,201,240,0.15); }
+.status-expfill { height: 100%; background: linear-gradient(90deg,var(--blue),var(--gold)); border-radius: 10px; transition: width .6s; }
+.status-explabel { font-size: 0.7rem; color: var(--muted); margin-top: 4px; }
+.st-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.st-stat { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+.st-stat-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.st-stat-val { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold); }
+.st-stat-label { font-size: 0.68rem; color: var(--muted); }
+.title-rows { margin-bottom: 16px; }
+.title-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--panel); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; margin-bottom: 7px; }
+.title-row.unlocked { border-color: var(--border); }
+.title-row.locked { opacity: 0.4; }
+.tr-icon { font-size: 1.2rem; }
+.tr-body { flex: 1; }
+.tr-name { font-size: 0.85rem; font-weight: 700; }
+.tr-cond { font-size: 0.7rem; color: var(--muted); }
+.tr-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
+.tr-badge.u { background: rgba(255,209,102,0.15); color: var(--gold); }
+.tr-badge.l { background: var(--panel2); color: var(--muted); }
+
+/* WORD TABLE */
+.word-table { width: 100%; border-collapse: collapse; }
+.word-table th { font-size: 0.65rem; color: var(--muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 1px; }
+.word-table td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+.word-table tr:last-child td { border-bottom: none; }
+.wt-en { font-family: 'Fredoka One', cursive; color: var(--blue); font-size: 1rem; }
+.wt-stage { padding: 2px 8px; border-radius: 10px; font-size: 0.65rem; font-weight: 700; }
+.wt-stage.s0 { background: var(--panel2); color: var(--muted); }
+.wt-stage.s1 { background: rgba(76,201,240,0.15); color: var(--st1-color); }
+.wt-stage.s2 { background: rgba(6,214,160,0.15); color: var(--st2-color); }
+.wt-stage.s3 { background: rgba(244,162,97,0.15); color: var(--st3-color); }
+.wt-stage.sm { background: rgba(255,209,102,0.15); color: var(--gold); }
+.wt-acc { font-size: 0.78rem; color: var(--muted); }
+
+/* TOAST */
+.toast { position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-16px); background: var(--panel2); border: 1px solid var(--gold); border-radius: 12px; padding: 10px 20px; font-size: 0.88rem; font-weight: 700; color: var(--gold); z-index: 999; opacity: 0; pointer-events: none; transition: all .3s; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* LEVEL UP */
+.lu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 500; display: none; align-items: center; justify-content: center; }
+.lu-overlay.show { display: flex; }
+.lu-box { background: linear-gradient(135deg,var(--panel),#1a2a50); border: 2px solid var(--gold); border-radius: 20px; padding: 36px 28px; text-align: center; max-width: 300px; width: 90%; animation: pop .4s cubic-bezier(.22,1,.36,1); }
+.lu-icon { font-size: 3.5rem; margin-bottom: 10px; animation: float 2s ease-in-out infinite; }
+.lu-sub { font-family: 'Fredoka One', cursive; font-size: 0.9rem; color: var(--muted); margin-bottom: 4px; }
+.lu-lv { font-family: 'Fredoka One', cursive; font-size: 2.8rem; color: var(--gold); text-shadow: 0 0 20px rgba(255,209,102,0.6); margin-bottom: 6px; }
+.lu-title { font-size: 0.88rem; color: var(--text); margin-bottom: 20px; }
+.lu-btn { padding: 12px 28px; border: none; border-radius: 10px; background: linear-gradient(135deg,var(--gold),var(--gold2)); color: #0a1020; font-family: 'Noto Sans JP',sans-serif; font-size: 0.95rem; font-weight: 900; cursor: pointer; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="stars-bg" id="starsBg"></div>
+<div id="app">
+
+  <div class="gateway-bar">
+    <a href="gateway.html" class="gateway-link">🏠 学年選択に戻る</a>
+    <div class="grade-badge">中学1年生</div>
+  </div>
+
+  <header>
+    <div class="h-top">
+      <div class="logo">✨ Word<em>Quest</em> <span>中1</span></div>
+      <div class="h-badges">
+        <div class="badge fire" id="streakBadge">🔥 1日</div>
+        <div class="badge" id="scoreBadge">💎 0pt</div>
+      </div>
+    </div>
+    <div class="exp-row">
+      <span id="hTitleLabel">見習い冒険者</span>
+      <span id="hExpLabel">EXP 0/80</span>
+    </div>
+    <div class="exp-track"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('home')">🏠 ホーム</div>
+    <div class="tab" onclick="switchTab('quest')">⚔️ クエスト</div>
+    <div class="tab" onclick="switchTab('words')">📖 単語帳</div>
+    <div class="tab" onclick="switchTab('status')">📊 ステータス</div>
+  </div>
+
+  <!-- HOME -->
+  <div id="tab-home" class="content">
+    <div class="hero-card">
+      <span class="hero-avatar" id="heroAvatar">🌱</span>
+      <div class="hero-lv" id="heroLv">1</div>
+      <div class="hero-lv-label">LEVEL</div>
+      <div class="hero-title-badge" id="heroTitleBadge">🌱 見習い冒険者</div>
+    </div>
+
+    <div class="section-label">📅 今日の進捗</div>
+    <div class="stats-row">
+      <div class="stat-mini"><div class="stat-mini-val" id="todayQNum">0</div><div class="stat-mini-label">今日の問題数</div></div>
+      <div class="stat-mini"><div class="stat-mini-val" id="todayAccNum">－</div><div class="stat-mini-label">正解率</div></div>
+      <div class="stat-mini"><div class="stat-mini-val" id="todayRoundsNum">0</div><div class="stat-mini-label">周回数</div></div>
+    </div>
+
+    <div class="section-label">✅ デイリーミッション</div>
+    <div class="mission-card" id="mc1">
+      <div class="mc-icon">⚔️</div>
+      <div class="mc-body">
+        <div class="mc-title">30問クリア（1周）</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc1bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc1sub">0 / 30 問</div>
+      </div>
+      <div class="mc-check" id="mc1check">⬜</div>
+    </div>
+    <div class="mission-card" id="mc2">
+      <div class="mc-icon">🎯</div>
+      <div class="mc-body">
+        <div class="mc-title">正解率80%以上</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc2bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc2sub">未達成</div>
+      </div>
+      <div class="mc-check" id="mc2check">⬜</div>
+    </div>
+    <div class="mission-card" id="mc3">
+      <div class="mc-icon">🔁</div>
+      <div class="mc-body">
+        <div class="mc-title">2周クリア</div>
+        <div class="mc-bar-track"><div class="mc-bar-fill" id="mc3bar" style="width:0%"></div></div>
+        <div class="mc-sub" id="mc3sub">0 / 2 周</div>
+      </div>
+      <div class="mc-check" id="mc3check">⬜</div>
+    </div>
+
+    <div class="section-label" style="margin-top:18px">⭐ ステージ選択</div>
+    <div class="stage-cards">
+      <div class="stage-card sel" id="stCard0" onclick="selectStage(0)">
+        <div class="stage-pip">★</div>
+        <div class="stage-icon">👀</div>
+        <div class="stage-name" style="color:var(--st1-color)">Stage 1</div>
+        <div class="stage-desc">英語→日本語<br>4択クイズ</div>
+      </div>
+      <div class="stage-card locked" id="stCard1" onclick="selectStage(1)">
+        <div class="stage-pip">★★</div>
+        <div class="stage-icon">✍️</div>
+        <div class="stage-name" style="color:var(--st2-color)">Stage 2</div>
+        <div class="stage-desc">日本語→英語<br>スペル記述</div>
+        <div class="stage-unlock" id="st2unlock">Lv.3で解放</div>
+      </div>
+      <div class="stage-card locked" id="stCard2" onclick="selectStage(2)">
+        <div class="stage-pip">★★★</div>
+        <div class="stage-icon">💬</div>
+        <div class="stage-name" style="color:var(--st3-color)">Stage 3</div>
+        <div class="stage-desc">英文作成<br>応用問題</div>
+        <div class="stage-unlock" id="st3unlock">Lv.7で解放</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:18px">📊 単語の習熟度マップ</div>
+    <div class="word-count-info">全 <span id="totalWordCount">0</span> 語収録 ／ 毎回30問ランダム出題</div>
+    <div class="word-progress-grid" id="wordDots"></div>
+
+    <button class="start-btn" onclick="startQuest()">⚔️ クエスト開始！</button>
+  </div>
+
+  <!-- QUEST -->
+  <div id="tab-quest" class="hidden">
+    <div id="questInner"></div>
+  </div>
+
+  <!-- WORDS -->
+  <div id="tab-words" class="content hidden">
+    <div class="section-label">📖 単語リスト（中1・高校入試頻出）</div>
+    <table class="word-table">
+      <thead><tr><th>英語</th><th>日本語</th><th>習熟</th><th>正解率</th></tr></thead>
+      <tbody id="wordTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- STATUS -->
+  <div id="tab-status" class="content hidden">
+    <div class="status-hero">
+      <div class="status-avatar" id="stAvatar">🌱</div>
+      <div class="status-lv">Lv. <span id="stLv">1</span></div>
+      <div class="status-title" id="stTitle">見習い冒険者</div>
+      <div class="status-expbar"><div class="status-expfill" id="stExpFill" style="width:0%"></div></div>
+      <div class="status-explabel" id="stExpLabel">EXP: 0 / 80</div>
+    </div>
+    <div class="st-stats">
+      <div class="st-stat"><div class="st-stat-icon">💎</div><div class="st-stat-val" id="stScore">0</div><div class="st-stat-label">総スコア</div></div>
+      <div class="st-stat"><div class="st-stat-icon">📝</div><div class="st-stat-val" id="stTotal">0</div><div class="st-stat-label">総回答数</div></div>
+      <div class="st-stat"><div class="st-stat-icon">✅</div><div class="st-stat-val" id="stCorrect">0</div><div class="st-stat-label">正解数</div></div>
+      <div class="st-stat"><div class="st-stat-icon">🔁</div><div class="st-stat-val" id="stRounds">0</div><div class="st-stat-label">総周回数</div></div>
+    </div>
+    <div class="section-label">🏆 称号一覧</div>
+    <div class="title-rows" id="titleRows"></div>
+  </div>
+</div>
+
+<div class="lu-overlay" id="luOverlay">
+  <div class="lu-box">
+    <div class="lu-icon">⭐</div>
+    <div class="lu-sub">LEVEL UP!</div>
+    <div class="lu-lv" id="luLv">Lv.2</div>
+    <div class="lu-title" id="luTitle">称号：見習い冒険者</div>
+    <button class="lu-btn" onclick="closeLu()">続ける ▶</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 中1 高校入試頻出単語リスト（180語）──
+const WORDS = [
+  // 基本動詞
+  {en:"ask",      ja:"尋ねる・頼む",      ex:"Please ask your teacher.",         exJa:"先生に聞いてください。"},
+  {en:"bring",    ja:"持ってくる",         ex:"Please bring your textbook.",      exJa:"教科書を持ってきてください。"},
+  {en:"buy",      ja:"買う",               ex:"I want to buy a new bag.",         exJa:"新しいかばんを買いたいです。"},
+  {en:"call",     ja:"呼ぶ・電話する",     ex:"Please call me tonight.",          exJa:"今夜私に電話してください。"},
+  {en:"carry",    ja:"運ぶ",               ex:"Can you carry this box?",          exJa:"この箱を運んでもらえますか？"},
+  {en:"catch",    ja:"捕まえる",           ex:"I can catch the ball.",            exJa:"私はボールを捕まえることができます。"},
+  {en:"clean",    ja:"掃除する・きれいな", ex:"Please clean your room.",          exJa:"部屋を掃除してください。"},
+  {en:"close",    ja:"閉める・近い",       ex:"Please close the door.",           exJa:"ドアを閉めてください。"},
+  {en:"come",     ja:"来る",               ex:"Please come here.",                exJa:"ここに来てください。"},
+  {en:"cook",     ja:"料理する",           ex:"My mother cooks dinner.",          exJa:"母が夕食を料理します。"},
+  {en:"cut",      ja:"切る",               ex:"Please cut the paper.",            exJa:"紙を切ってください。"},
+  {en:"draw",     ja:"描く",               ex:"I like to draw pictures.",         exJa:"私は絵を描くのが好きです。"},
+  {en:"drink",    ja:"飲む",               ex:"I drink water every day.",         exJa:"私は毎日水を飲みます。"},
+  {en:"drive",    ja:"運転する",           ex:"My father drives a car.",          exJa:"父は車を運転します。"},
+  {en:"eat",      ja:"食べる",             ex:"I eat breakfast every morning.",   exJa:"私は毎朝朝食を食べます。"},
+  {en:"enjoy",    ja:"楽しむ",             ex:"I enjoy playing tennis.",          exJa:"私はテニスをするのを楽しみます。"},
+  {en:"finish",   ja:"終える",             ex:"I finish school at three.",        exJa:"私は3時に学校が終わります。"},
+  {en:"get",      ja:"得る・なる",         ex:"I get up at seven.",               exJa:"私は7時に起きます。"},
+  {en:"give",     ja:"与える",             ex:"Please give me some water.",       exJa:"水をください。"},
+  {en:"go",       ja:"行く",               ex:"I go to school by bus.",           exJa:"私はバスで学校に行きます。"},
+  {en:"have",     ja:"持っている",         ex:"I have a dog.",                    exJa:"私は犬を飼っています。"},
+  {en:"help",     ja:"助ける",             ex:"Please help me.",                  exJa:"私を助けてください。"},
+  {en:"jump",     ja:"跳ぶ",               ex:"The dog can jump high.",           exJa:"その犬は高く跳べます。"},
+  {en:"know",     ja:"知っている",         ex:"Do you know her name?",            exJa:"彼女の名前を知っていますか？"},
+  {en:"learn",    ja:"学ぶ",               ex:"I learn English at school.",       exJa:"私は学校で英語を学びます。"},
+  {en:"leave",    ja:"出発する・去る",     ex:"I leave home at eight.",           exJa:"私は8時に家を出ます。"},
+  {en:"like",     ja:"好きだ",             ex:"I like soccer.",                   exJa:"私はサッカーが好きです。"},
+  {en:"listen",   ja:"聞く",               ex:"Please listen to me.",             exJa:"私の話を聞いてください。"},
+  {en:"live",     ja:"住む・生きる",       ex:"I live in Tokyo.",                 exJa:"私は東京に住んでいます。"},
+  {en:"look",     ja:"見る",               ex:"Look at this picture.",            exJa:"この写真を見てください。"},
+  {en:"love",     ja:"愛する・大好きだ",  ex:"I love my family.",                exJa:"私は家族が大好きです。"},
+  {en:"make",     ja:"作る",               ex:"I make lunch every day.",          exJa:"私は毎日お昼ごはんを作ります。"},
+  {en:"meet",     ja:"会う",               ex:"I meet my friends on Sunday.",     exJa:"私は日曜日に友達に会います。"},
+  {en:"open",     ja:"開ける",             ex:"Please open the window.",          exJa:"窓を開けてください。"},
+  {en:"play",     ja:"遊ぶ・演奏する",    ex:"I play soccer after school.",      exJa:"私は放課後サッカーをします。"},
+  {en:"read",     ja:"読む",               ex:"I read books every night.",        exJa:"私は毎晩本を読みます。"},
+  {en:"ride",     ja:"乗る",               ex:"I ride a bike to school.",         exJa:"私は自転車で学校に行きます。"},
+  {en:"run",      ja:"走る",               ex:"I run every morning.",             exJa:"私は毎朝走ります。"},
+  {en:"say",      ja:"言う",               ex:"What did he say?",                 exJa:"彼は何と言いましたか？"},
+  {en:"see",      ja:"見る・会う",         ex:"I see a bird in the sky.",         exJa:"空に鳥が見えます。"},
+  {en:"send",     ja:"送る",               ex:"Please send me a message.",        exJa:"メッセージを送ってください。"},
+  {en:"show",     ja:"見せる",             ex:"Please show me your notebook.",    exJa:"ノートを見せてください。"},
+  {en:"sing",     ja:"歌う",               ex:"She sings very well.",             exJa:"彼女はとても上手に歌います。"},
+  {en:"sit",      ja:"座る",               ex:"Please sit down.",                 exJa:"座ってください。"},
+  {en:"sleep",    ja:"眠る",               ex:"I sleep for eight hours.",         exJa:"私は8時間眠ります。"},
+  {en:"speak",    ja:"話す",               ex:"I can speak English.",             exJa:"私は英語を話せます。"},
+  {en:"stand",    ja:"立つ",               ex:"Please stand up.",                 exJa:"立ってください。"},
+  {en:"start",    ja:"始める",             ex:"Let's start the lesson.",          exJa:"授業を始めましょう。"},
+  {en:"study",    ja:"勉強する",           ex:"I study math every day.",          exJa:"私は毎日数学を勉強します。"},
+  {en:"swim",     ja:"泳ぐ",               ex:"I swim in the sea.",               exJa:"私は海で泳ぎます。"},
+  {en:"take",     ja:"取る・連れて行く",   ex:"Take this book home.",             exJa:"この本を家に持って帰りなさい。"},
+  {en:"talk",     ja:"話す",               ex:"I talk with my friends.",          exJa:"私は友達と話します。"},
+  {en:"teach",    ja:"教える",             ex:"She teaches math.",                exJa:"彼女は数学を教えています。"},
+  {en:"tell",     ja:"伝える・話す",       ex:"Please tell me your name.",        exJa:"名前を教えてください。"},
+  {en:"think",    ja:"思う・考える",       ex:"I think he is kind.",              exJa:"私は彼は親切だと思います。"},
+  {en:"try",      ja:"試みる",             ex:"Please try again.",                exJa:"もう一度試してください。"},
+  {en:"turn",     ja:"曲がる・回る",       ex:"Turn right at the corner.",        exJa:"角を右に曲がってください。"},
+  {en:"use",      ja:"使う",               ex:"I use a computer at school.",      exJa:"私は学校でコンピュータを使います。"},
+  {en:"visit",    ja:"訪れる",             ex:"I want to visit Kyoto.",           exJa:"私は京都を訪れたいです。"},
+  {en:"wait",     ja:"待つ",               ex:"Please wait a moment.",            exJa:"少しお待ちください。"},
+  {en:"walk",     ja:"歩く",               ex:"I walk to school.",                exJa:"私は歩いて学校に行きます。"},
+  {en:"want",     ja:"欲しい・したい",     ex:"I want a new bike.",               exJa:"私は新しい自転車が欲しいです。"},
+  {en:"wash",     ja:"洗う",               ex:"Wash your hands before meals.",    exJa:"食事の前に手を洗いなさい。"},
+  {en:"watch",    ja:"見る・時計",         ex:"I watch TV after dinner.",         exJa:"私は夕食後テレビを見ます。"},
+  {en:"work",     ja:"働く・機能する",     ex:"My father works in a hospital.",   exJa:"父は病院で働いています。"},
+  {en:"write",    ja:"書く",               ex:"Please write your name here.",     exJa:"ここに名前を書いてください。"},
+  // 名詞
+  {en:"animal",   ja:"動物",               ex:"I like animals.",                  exJa:"私は動物が好きです。"},
+  {en:"answer",   ja:"答え・答える",       ex:"Please write your answer.",        exJa:"答えを書いてください。"},
+  {en:"bag",      ja:"かばん",             ex:"This is my school bag.",           exJa:"これは私のスクールバッグです。"},
+  {en:"ball",     ja:"ボール",             ex:"Kick the ball!",                   exJa:"ボールを蹴って！"},
+  {en:"birthday", ja:"誕生日",             ex:"My birthday is in April.",         exJa:"私の誕生日は4月です。"},
+  {en:"book",     ja:"本",                 ex:"I have many books.",               exJa:"私はたくさんの本を持っています。"},
+  {en:"box",      ja:"箱",                 ex:"Put it in the box.",               exJa:"箱の中に入れてください。"},
+  {en:"bread",    ja:"パン",               ex:"I eat bread for breakfast.",       exJa:"私は朝食にパンを食べます。"},
+  {en:"brother",  ja:"兄・弟",             ex:"I have one brother.",              exJa:"私には兄が一人います。"},
+  {en:"bus",      ja:"バス",               ex:"I go to school by bus.",           exJa:"私はバスで学校に行きます。"},
+  {en:"cake",     ja:"ケーキ",             ex:"She made a birthday cake.",        exJa:"彼女は誕生日ケーキを作りました。"},
+  {en:"chair",    ja:"いす",               ex:"Please sit on the chair.",         exJa:"いすに座ってください。"},
+  {en:"city",     ja:"都市",               ex:"I live in a big city.",            exJa:"私は大きな都市に住んでいます。"},
+  {en:"class",    ja:"クラス・授業",       ex:"My class has 30 students.",        exJa:"私のクラスには30人の生徒がいます。"},
+  {en:"club",     ja:"クラブ",             ex:"I am in the soccer club.",         exJa:"私はサッカークラブに入っています。"},
+  {en:"color",    ja:"色",                 ex:"What is your favorite color?",     exJa:"好きな色は何ですか？"},
+  {en:"country",  ja:"国",                 ex:"Japan is a beautiful country.",    exJa:"日本は美しい国です。"},
+  {en:"door",     ja:"ドア",               ex:"Please close the door.",           exJa:"ドアを閉めてください。"},
+  {en:"dream",    ja:"夢",                 ex:"My dream is to be a teacher.",     exJa:"私の夢は先生になることです。"},
+  {en:"family",   ja:"家族",               ex:"I love my family.",                exJa:"私は家族が大好きです。"},
+  {en:"flower",   ja:"花",                 ex:"She likes flowers.",               exJa:"彼女は花が好きです。"},
+  {en:"food",     ja:"食べ物",             ex:"Japanese food is delicious.",      exJa:"日本の食べ物はおいしいです。"},
+  {en:"friend",   ja:"友達",               ex:"She is my best friend.",           exJa:"彼女は私の親友です。"},
+  {en:"game",     ja:"ゲーム・試合",       ex:"Let's play a game.",               exJa:"ゲームをしましょう。"},
+  {en:"garden",   ja:"庭",                 ex:"There are many flowers in the garden.", exJa:"庭にはたくさんの花があります。"},
+  {en:"girl",     ja:"女の子",             ex:"She is a nice girl.",              exJa:"彼女は素敵な女の子です。"},
+  {en:"hospital", ja:"病院",               ex:"My mother works at a hospital.",   exJa:"母は病院で働いています。"},
+  {en:"house",    ja:"家",                 ex:"My house is near the station.",    exJa:"私の家は駅の近くにあります。"},
+  {en:"kitchen",  ja:"台所",               ex:"My mother is in the kitchen.",     exJa:"母は台所にいます。"},
+  {en:"letter",   ja:"手紙・文字",         ex:"I write a letter to my friend.",   exJa:"友達に手紙を書きます。"},
+  {en:"library",  ja:"図書館",             ex:"I study at the library.",          exJa:"私は図書館で勉強します。"},
+  {en:"lunch",    ja:"昼食",               ex:"I eat lunch at noon.",             exJa:"私は正午に昼食を食べます。"},
+  {en:"money",    ja:"お金",               ex:"I don't have much money.",         exJa:"私はあまりお金を持っていません。"},
+  {en:"music",    ja:"音楽",               ex:"I like music very much.",          exJa:"私は音楽がとても好きです。"},
+  {en:"name",     ja:"名前",               ex:"My name is Yuki.",                 exJa:"私の名前はユキです。"},
+  {en:"park",     ja:"公園",               ex:"I play in the park.",              exJa:"私は公園で遊びます。"},
+  {en:"picture",  ja:"絵・写真",           ex:"This is a beautiful picture.",     exJa:"これは美しい絵です。"},
+  {en:"place",    ja:"場所",               ex:"This is a nice place.",            exJa:"ここは良い場所です。"},
+  {en:"question", ja:"質問",               ex:"Do you have any questions?",       exJa:"何か質問はありますか？"},
+  {en:"rice",     ja:"ご飯・米",           ex:"I eat rice every day.",            exJa:"私は毎日ご飯を食べます。"},
+  {en:"river",    ja:"川",                 ex:"We swim in the river.",            exJa:"私たちは川で泳ぎます。"},
+  {en:"room",     ja:"部屋",               ex:"My room is small.",                exJa:"私の部屋は小さいです。"},
+  {en:"school",   ja:"学校",               ex:"I like my school.",                exJa:"私は学校が好きです。"},
+  {en:"season",   ja:"季節",               ex:"My favorite season is spring.",    exJa:"私の好きな季節は春です。"},
+  {en:"sister",   ja:"姉・妹",             ex:"I have one sister.",               exJa:"私には姉が一人います。"},
+  {en:"sky",      ja:"空",                 ex:"The sky is blue today.",           exJa:"今日は空が青いです。"},
+  {en:"sport",    ja:"スポーツ",           ex:"I like sports.",                   exJa:"私はスポーツが好きです。"},
+  {en:"station",  ja:"駅",                 ex:"The station is near my house.",    exJa:"駅は私の家の近くにあります。"},
+  {en:"store",    ja:"店",                 ex:"There is a store near here.",      exJa:"ここの近くに店があります。"},
+  {en:"street",   ja:"通り・道",           ex:"Walk down this street.",           exJa:"この通りを歩いてください。"},
+  {en:"student",  ja:"生徒",               ex:"I am a junior high school student.", exJa:"私は中学生です。"},
+  {en:"subject",  ja:"科目",               ex:"My favorite subject is English.",  exJa:"私の好きな科目は英語です。"},
+  {en:"table",    ja:"テーブル",           ex:"Please put it on the table.",      exJa:"テーブルの上に置いてください。"},
+  {en:"teacher",  ja:"先生",               ex:"My teacher is very kind.",         exJa:"私の先生はとても親切です。"},
+  {en:"team",     ja:"チーム",             ex:"I am on the basketball team.",     exJa:"私はバスケットボールチームに入っています。"},
+  {en:"time",     ja:"時間・時刻",         ex:"What time is it now?",             exJa:"今何時ですか？"},
+  {en:"town",     ja:"町",                 ex:"I live in a small town.",          exJa:"私は小さな町に住んでいます。"},
+  {en:"tree",     ja:"木",                 ex:"There is a big tree in the park.", exJa:"公園に大きな木があります。"},
+  {en:"trip",     ja:"旅行",               ex:"I want to go on a trip.",          exJa:"私は旅行に行きたいです。"},
+  {en:"uniform",  ja:"制服",               ex:"We wear a school uniform.",        exJa:"私たちは学校の制服を着ます。"},
+  {en:"water",    ja:"水",                 ex:"Please drink more water.",         exJa:"もっと水を飲んでください。"},
+  {en:"weather",  ja:"天気",               ex:"The weather is nice today.",       exJa:"今日は天気が良いです。"},
+  {en:"week",     ja:"週",                 ex:"I practice soccer twice a week.",  exJa:"私は週2回サッカーを練習します。"},
+  {en:"window",   ja:"窓",                 ex:"Please open the window.",          exJa:"窓を開けてください。"},
+  {en:"world",    ja:"世界",               ex:"I want to travel around the world.", exJa:"私は世界中を旅したいです。"},
+  {en:"year",     ja:"年",                 ex:"I am thirteen years old.",         exJa:"私は13歳です。"},
+  // 形容詞・副詞
+  {en:"beautiful",ja:"美しい",             ex:"This flower is beautiful.",        exJa:"この花は美しいです。"},
+  {en:"big",      ja:"大きい",             ex:"My school is very big.",           exJa:"私の学校はとても大きいです。"},
+  {en:"busy",     ja:"忙しい",             ex:"My mother is very busy.",          exJa:"母はとても忙しいです。"},
+  {en:"easy",     ja:"簡単な",             ex:"This problem is easy.",            exJa:"この問題は簡単です。"},
+  {en:"exciting", ja:"わくわくする",       ex:"The game was exciting.",           exJa:"その試合はわくわくしました。"},
+  {en:"famous",   ja:"有名な",             ex:"She is a famous singer.",          exJa:"彼女は有名な歌手です。"},
+  {en:"fast",     ja:"速い",               ex:"He can run fast.",                 exJa:"彼は速く走れます。"},
+  {en:"free",     ja:"自由な・無料の",     ex:"I am free on Sunday.",             exJa:"私は日曜日は暇です。"},
+  {en:"glad",     ja:"うれしい",           ex:"I am glad to hear that.",          exJa:"それを聞いてうれしいです。"},
+  {en:"great",    ja:"すばらしい",         ex:"You did a great job!",             exJa:"よくできました！"},
+  {en:"happy",    ja:"幸せな・うれしい",   ex:"I am very happy today.",           exJa:"今日はとてもうれしいです。"},
+  {en:"hard",     ja:"一生懸命に・難しい", ex:"I study hard every day.",          exJa:"私は毎日一生懸命勉強します。"},
+  {en:"high",     ja:"高い",               ex:"The mountain is very high.",       exJa:"その山はとても高いです。"},
+  {en:"hot",      ja:"暑い・熱い",         ex:"It is hot today.",                 exJa:"今日は暑いです。"},
+  {en:"hungry",   ja:"空腹の",             ex:"I am hungry.",                     exJa:"お腹が空いています。"},
+  {en:"important",ja:"重要な",             ex:"English is an important subject.", exJa:"英語は重要な科目です。"},
+  {en:"interesting",ja:"おもしろい",       ex:"This book is interesting.",        exJa:"この本はおもしろいです。"},
+  {en:"kind",     ja:"親切な",             ex:"She is very kind.",                exJa:"彼女はとても親切です。"},
+  {en:"large",    ja:"大きい",             ex:"Japan is not a large country.",    exJa:"日本は大きな国ではありません。"},
+  {en:"long",     ja:"長い",               ex:"The river is very long.",          exJa:"その川はとても長いです。"},
+  {en:"new",      ja:"新しい",             ex:"I have a new friend.",             exJa:"私には新しい友達がいます。"},
+  {en:"nice",     ja:"すてきな・良い",     ex:"She is a nice person.",            exJa:"彼女は素敵な人です。"},
+  {en:"old",      ja:"古い・年を取った",   ex:"This is an old building.",         exJa:"これは古い建物です。"},
+  {en:"popular",  ja:"人気のある",         ex:"Soccer is popular in Japan.",      exJa:"サッカーは日本で人気があります。"},
+  {en:"pretty",   ja:"かわいい",           ex:"She is a pretty girl.",            exJa:"彼女はかわいい女の子です。"},
+  {en:"sad",      ja:"悲しい",             ex:"I am sad today.",                  exJa:"今日は悲しいです。"},
+  {en:"small",    ja:"小さい",             ex:"My room is small.",                exJa:"私の部屋は小さいです。"},
+  {en:"strong",   ja:"強い",               ex:"He is a strong player.",           exJa:"彼は強い選手です。"},
+  {en:"tall",     ja:"背が高い",           ex:"My brother is very tall.",         exJa:"兄はとても背が高いです。"},
+  {en:"tired",    ja:"疲れた",             ex:"I am tired today.",                exJa:"今日は疲れています。"},
+  {en:"useful",   ja:"役に立つ",           ex:"English is very useful.",          exJa:"英語はとても役に立ちます。"},
+  {en:"young",    ja:"若い",               ex:"She looks young.",                 exJa:"彼女は若く見えます。"},
+  // 重要表現・接続詞・前置詞など
+  {en:"about",    ja:"〜について・約",     ex:"Tell me about yourself.",          exJa:"自己紹介をしてください。"},
+  {en:"after",    ja:"〜の後で",           ex:"I study after dinner.",            exJa:"私は夕食の後で勉強します。"},
+  {en:"again",    ja:"再び・もう一度",     ex:"Please say it again.",             exJa:"もう一度言ってください。"},
+  {en:"also",     ja:"〜もまた",           ex:"I also like music.",               exJa:"私も音楽が好きです。"},
+  {en:"always",   ja:"いつも",             ex:"I always brush my teeth.",         exJa:"私はいつも歯を磨きます。"},
+  {en:"around",   ja:"〜の周りに・約",     ex:"There are trees around the house.", exJa:"家の周りに木があります。"},
+  {en:"before",   ja:"〜の前に",           ex:"Wash your hands before eating.",   exJa:"食べる前に手を洗いなさい。"},
+  {en:"between",  ja:"〜の間に",           ex:"The shop is between the bank and the post office.", exJa:"その店は銀行と郵便局の間にあります。"},
+  {en:"both",     ja:"両方",               ex:"Both of them are my friends.",     exJa:"二人とも私の友達です。"},
+  {en:"each",     ja:"それぞれの",         ex:"Each student has a textbook.",     exJa:"それぞれの生徒が教科書を持っています。"},
+  {en:"enough",   ja:"十分な",             ex:"I have enough time.",              exJa:"私には十分な時間があります。"},
+  {en:"every",    ja:"毎〜・すべての",     ex:"I study every day.",               exJa:"私は毎日勉強します。"},
+  {en:"few",      ja:"ほとんどない・少数の", ex:"I have a few friends here.",    exJa:"ここには何人かの友達がいます。"},
+  {en:"just",     ja:"ちょうど・ただ",     ex:"I just came home.",                exJa:"今帰ってきたばかりです。"},
+  {en:"many",     ja:"たくさんの",         ex:"I have many books.",               exJa:"私はたくさんの本を持っています。"},
+  {en:"much",     ja:"たくさんの・とても", ex:"I don't have much money.",         exJa:"私はあまりお金を持っていません。"},
+  {en:"never",    ja:"決して〜ない",       ex:"I never eat fast food.",           exJa:"私は決してファストフードを食べません。"},
+  {en:"now",      ja:"今",                 ex:"I am doing my homework now.",      exJa:"私は今宿題をしています。"},
+  {en:"often",    ja:"よく・しばしば",     ex:"I often go to the library.",       exJa:"私はよく図書館に行きます。"},
+  {en:"only",     ja:"ただ〜だけ",         ex:"I have only one brother.",         exJa:"私には兄が一人しかいません。"},
+  {en:"other",    ja:"他の",               ex:"Do you have any other questions?", exJa:"他に質問はありますか？"},
+  {en:"really",   ja:"本当に",             ex:"I really like this song.",         exJa:"私はこの歌が本当に好きです。"},
+  {en:"same",     ja:"同じ",               ex:"We have the same hobby.",          exJa:"私たちは同じ趣味を持っています。"},
+  {en:"some",     ja:"いくつかの",         ex:"I have some questions.",           exJa:"いくつか質問があります。"},
+  {en:"sometimes",ja:"時々",               ex:"I sometimes cook dinner.",         exJa:"私は時々夕食を作ります。"},
+  {en:"still",    ja:"まだ・静止した",     ex:"I still have a lot to do.",        exJa:"まだやることがたくさんあります。"},
+  {en:"together", ja:"一緒に",             ex:"Let's play together.",             exJa:"一緒に遊びましょう。"},
+  {en:"under",    ja:"〜の下に",           ex:"The cat is under the table.",      exJa:"猫はテーブルの下にいます。"},
+  {en:"very",     ja:"とても",             ex:"She is very kind.",                exJa:"彼女はとても親切です。"},
+  {en:"well",     ja:"上手に・良く",       ex:"She speaks English well.",         exJa:"彼女は英語を上手に話します。"},
+  {en:"without",  ja:"〜なしに",           ex:"I can't live without music.",      exJa:"音楽なしでは生きていけません。"},
+];
+
+const TITLES = [
+  {name:"見習い冒険者",   icon:"🌱", cond:"スタート",   lv:1},
+  {name:"単語の見習い",   icon:"📖", cond:"Lv.3到達",   lv:3},
+  {name:"言葉の戦士",     icon:"⚔️", cond:"Lv.5到達",   lv:5},
+  {name:"英語の探求者",   icon:"🔍", cond:"Lv.8到達",   lv:8},
+  {name:"語彙の魔法使い", icon:"🧙", cond:"Lv.12到達",  lv:12},
+  {name:"英語の賢者",     icon:"📚", cond:"Lv.16到達",  lv:16},
+  {name:"言語マスター",   icon:"👑", cond:"Lv.20到達",  lv:20},
+];
+const AVATARS = ["🌱","🌱","🌿","🌿","⚔️","⚔️","⚔️","⚔️","🧙","🧙","🧙","🧙","📚","📚","📚","📚","🔮","🔮","🔮","👑"];
+const EXP_PER_LV = Array.from({length:30},(_,i)=>(i+1)*80);
+const QUEST_SIZE = 30;
+
+const G = {
+  lv:1, exp:0, score:0,
+  totalQ:0, totalOk:0, streak:1, totalRounds:0,
+  todayQ:0, todayOk:0, todayRounds:0,
+  selectedStage:0,
+  words: WORDS.map(()=>({stageReached:0, attempts:0, correct:0}))
+};
+let QS = null;
+
+// Stars
+(function(){
+  const c=document.getElementById('starsBg');
+  for(let i=0;i<50;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2+0.8;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--o:${0.15+Math.random()*0.5};animation-delay:${Math.random()*4}s`;
+    c.appendChild(s);
+  }
+})();
+
+document.getElementById('totalWordCount').textContent = WORDS.length;
+
+function switchTab(t){
+  ['home','quest','words','status'].forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden',x!==t));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['home','quest','words','status'][i]===t));
+  if(t==='words') renderWordTable();
+  if(t==='status') renderStatus();
+}
+
+function selectStage(s){
+  if(s===1&&G.lv<3){showToast('⚠️ Lv.3で解放されます！');return;}
+  if(s===2&&G.lv<7){showToast('⚠️ Lv.7で解放されます！');return;}
+  G.selectedStage=s;
+  [0,1,2].forEach(i=>document.getElementById('stCard'+i).classList.toggle('sel',i===s));
+}
+
+function updateStageLocks(){
+  if(G.lv>=3){document.getElementById('stCard1').classList.remove('locked');const u=document.getElementById('st2unlock');if(u)u.style.display='none';}
+  if(G.lv>=7){document.getElementById('stCard2').classList.remove('locked');const u=document.getElementById('st3unlock');if(u)u.style.display='none';}
+}
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function makeQ(wi, stage){
+  const w=WORDS[wi];
+  if(stage===0){
+    const wrong=shuffle(WORDS.filter((_,i)=>i!==wi)).slice(0,3).map(x=>x.ja);
+    const choices=shuffle([w.ja,...wrong]);
+    return {type:'choice',wi,stage,prompt:w.en,choices,answer:w.ja,exp:8};
+  } else if(stage===1){
+    return {type:'input',wi,stage,prompt:w.ja,hint:w.en[0],answer:w.en,exp:15};
+  } else {
+    return {type:'sentence',wi,stage,prompt:w.exJa,answer:w.ex,wordHint:w.en,exp:25};
+  }
+}
+
+function startQuest(){
+  const idxs=shuffle([...Array(WORDS.length).keys()]).slice(0, QUEST_SIZE);
+  QS={
+    qs:idxs.map(i=>makeQ(i,G.selectedStage)),
+    retryQueue:[],
+    idx:0, correct:0, total:0,
+    sessionExp:0, wrongWords:[], combo:0, maxCombo:0, answered:false
+  };
+  switchTab('quest');
+  renderQ();
+}
+
+function currentQ(){
+  if(QS.idx<QS.qs.length) return QS.qs[QS.idx];
+  if(QS.retryQueue.length>0) return QS.retryQueue[0];
+  return null;
+}
+
+function renderQ(){
+  const q=currentQ();
+  if(!q){renderResult();return;}
+  QS.answered=false;
+  const stL=['Stage 1　英→日','Stage 2　日→英','Stage 3　英文作成'];
+  const stC=['s1','s2','s3'];
+  const prog=QS.idx<QS.qs.length?`${QS.idx+1} / ${QS.qs.length}`:`復習 残${QS.retryQueue.length}問`;
+  const comboTxt=QS.combo>1?`🔥 ${QS.combo}コンボ！`:'';
+  let qHTML='';
+  if(q.type==='choice'){
+    const labs=['Ａ','Ｂ','Ｃ','Ｄ'];
+    qHTML=`
+      <div class="q-card" data-word="${q.prompt}">
+        <div class="q-label">この英単語の意味は？</div>
+        <div class="q-main english">${q.prompt}</div>
+      </div>
+      <div class="choices-wrap">
+        ${q.choices.map((c,i)=>`<button class="choice-btn" id="ch${i}" onclick="ansChoice(${i})"><span class="choice-num">${labs[i]}</span>${c}</button>`).join('')}
+      </div>`;
+  } else if(q.type==='input'){
+    qHTML=`
+      <div class="q-card" data-word="">
+        <div class="q-label">日本語を見て英単語を書こう</div>
+        <div class="q-main">${q.prompt}</div>
+        <div class="q-hint">ヒント：最初の文字は「<span>${q.hint.toUpperCase()}</span>」</div>
+      </div>
+      <div class="input-wrap">
+        <input class="ans-input" id="ansInput" placeholder="英語でスペルを入力…" autocomplete="off" autocapitalize="none" spellcheck="false" onkeydown="if(event.key==='Enter')submitInput()">
+        <button class="submit-btn" id="submitBtn" onclick="submitInput()">⚔️ 答える！</button>
+      </div>`;
+  } else {
+    qHTML=`
+      <div class="q-card" data-word="">
+        <div class="q-label">日本語文を英語にしよう</div>
+        <div class="q-main">${q.prompt}</div>
+        <div class="q-hint">キーワード：<span>${q.wordHint}</span>　語数：${q.answer.split(' ').length}語</div>
+      </div>
+      <div class="input-wrap">
+        <textarea class="ans-input" id="ansInput" placeholder="英文を入力…" rows="3" style="font-size:1rem;letter-spacing:0;resize:none;min-height:80px;"></textarea>
+        <button class="submit-btn" id="submitBtn" onclick="submitSentence()">⚔️ 答える！</button>
+      </div>`;
+  }
+  document.getElementById('questInner').innerHTML=`
+    <div class="stage-banner">
+      <span class="stage-badge ${stC[q.stage]}">${stL[q.stage]}</span>
+      <span class="combo-display">${comboTxt}</span>
+      <span class="q-counter">${prog}</span>
+    </div>
+    ${qHTML}
+    <div class="feedback-bar" id="fbBar"><div class="fb-icon" id="fbIcon"></div><div class="fb-body"><div id="fbText"></div><div class="fb-answer" id="fbAnswer"></div><div id="fbSub"></div></div></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">次へ ▶</button>`;
+  const inp=document.getElementById('ansInput');
+  if(inp) setTimeout(()=>inp.focus(),80);
+}
+
+function ansChoice(i){
+  if(QS.answered)return;
+  QS.answered=true;
+  const q=currentQ();
+  const ok=q.choices[i]===q.answer;
+  document.querySelectorAll('.choice-btn').forEach((btn,idx)=>{
+    btn.disabled=true;
+    if(q.choices[idx]===q.answer) btn.classList.add('correct');
+    else if(idx===i&&!ok) btn.classList.add('wrong');
+  });
+  processAns(ok,q);
+}
+
+function submitInput(){
+  if(QS.answered)return;
+  const inp=document.getElementById('ansInput');
+  if(!inp||!inp.value.trim())return;
+  QS.answered=true;
+  const q=currentQ();
+  const ok=inp.value.trim().toLowerCase()===q.answer.toLowerCase();
+  inp.disabled=true;
+  document.getElementById('submitBtn').disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  processAns(ok,q);
+}
+
+function submitSentence(){
+  if(QS.answered)return;
+  const inp=document.getElementById('ansInput');
+  if(!inp||!inp.value.trim())return;
+  QS.answered=true;
+  const q=currentQ();
+  const user=inp.value.trim().toLowerCase();
+  const ans=q.answer.toLowerCase();
+  const hasKW=user.includes(q.wordHint.toLowerCase());
+  const ok=user===ans||(hasKW&&Math.abs(user.split(' ').length-ans.split(' ').length)<=1);
+  inp.disabled=true;
+  document.getElementById('submitBtn').disabled=true;
+  inp.classList.add(ok?'correct':'wrong');
+  processAns(ok,q);
+}
+
+function processAns(ok,q){
+  QS.total++; G.totalQ++; G.todayQ++;
+  if(ok){
+    QS.correct++; QS.combo++; QS.maxCombo=Math.max(QS.maxCombo,QS.combo);
+    G.totalOk++; G.todayOk++;
+    const bonus=Math.min(QS.combo-1,5)*3;
+    const exp=q.exp+bonus;
+    QS.sessionExp+=exp; G.score+=exp*5;
+    G.words[q.wi].correct++;
+    if(G.words[q.wi].stageReached<=q.stage) G.words[q.wi].stageReached=q.stage+1;
+    gainExp(exp);
+    document.getElementById('fbIcon').textContent='✨';
+    document.getElementById('fbText').textContent=`正解！${QS.combo>1?` ${QS.combo}コンボ！`:''}`;
+    document.getElementById('fbAnswer').textContent=`答え：${q.answer}`;
+    document.getElementById('fbSub').innerHTML=`<span class="fb-exp">+${exp} EXP${bonus>0?` (コンボ+${bonus})`:''}`;
+    document.getElementById('fbBar').className='feedback-bar show ok';
+  } else {
+    QS.combo=0;
+    QS.retryQueue.push(makeQ(q.wi,q.stage));
+    if(!QS.wrongWords.find(w=>w.wi===q.wi)) QS.wrongWords.push({wi:q.wi,ans:q.answer});
+    document.getElementById('fbIcon').textContent='💔';
+    document.getElementById('fbText').textContent='惜しい！後でもう一度出てくるよ';
+    document.getElementById('fbAnswer').textContent=`正解：${q.answer}`;
+    document.getElementById('fbSub').innerHTML=`<span class="fb-retry">この単語は後で再挑戦！</span>`;
+    document.getElementById('fbBar').className='feedback-bar show ng';
+  }
+  G.words[q.wi].attempts++;
+  document.getElementById('nextBtn').classList.add('show');
+  updateHeader(); updateMissions(); updateWordDots();
+  saveGame();
+}
+
+function nextQ(){
+  if(QS.idx<QS.qs.length){
+    QS.idx++;
+    if(QS.idx===QS.qs.length&&QS.retryQueue.length===0) completedRound();
+  } else if(QS.retryQueue.length>0){
+    QS.retryQueue.shift();
+    if(QS.retryQueue.length===0) completedRound();
+  }
+  renderQ();
+}
+
+function completedRound(){
+  G.totalRounds++; G.todayRounds++;
+  updateMissions();
+  showToast(`🎉 ${G.totalRounds}周目クリア！`);
+}
+
+function renderResult(){
+  const acc=QS.total>0?Math.round(QS.correct/QS.total*100):0;
+  const stN=['Stage 1','Stage 2','Stage 3'];
+  const wrongHTML=QS.wrongWords.length>0?`
+    <div class="wrong-list">
+      <div class="wrong-list-title">⚠️ 間違えた単語（${QS.wrongWords.length}語）</div>
+      ${QS.wrongWords.map(w=>`<div class="wrong-item"><span class="wrong-en">${WORDS[w.wi].en}</span><span class="wrong-ja">${WORDS[w.wi].ja}</span></div>`).join('')}
+    </div>`:'<div style="color:var(--green);font-weight:700;text-align:center;padding:12px;margin-bottom:14px">🎉 全問正解！完璧です！</div>';
+  document.getElementById('questInner').innerHTML=`
+    <div class="result-wrap">
+      <div class="result-icon">${acc>=80?'🏆':acc>=60?'⭐':'💪'}</div>
+      <div class="result-title">クエスト完了！</div>
+      <div class="result-round">${stN[G.selectedStage]}・累計${G.totalRounds}周</div>
+      <div class="result-big">${QS.correct} <span style="font-size:1.5rem;color:var(--muted)">/ ${QS.total}</span></div>
+      <div class="result-acc">正解率 ${acc}%</div>
+      <div class="result-grid">
+        <div class="result-cell"><div class="result-cell-val">${QS.sessionExp}</div><div class="result-cell-label">獲得EXP</div></div>
+        <div class="result-cell"><div class="result-cell-val">${QS.maxCombo}</div><div class="result-cell-label">最大コンボ</div></div>
+        <div class="result-cell"><div class="result-cell-val">${G.totalRounds}</div><div class="result-cell-label">累計周回</div></div>
+        <div class="result-cell"><div class="result-cell-val">Lv.${G.lv}</div><div class="result-cell-label">現在レベル</div></div>
+      </div>
+      ${wrongHTML}
+      <div class="action-btns">
+        <button class="action-btn primary" onclick="startQuest()">⚔️ もう一周！</button>
+        <button class="action-btn secondary" onclick="switchTab('home')">🏠 ホームへ</button>
+        <button class="action-btn gateway" onclick="location.href='gateway.html'">🏫 学年選択へ</button>
+      </div>
+    </div>`;
+}
+
+function gainExp(amount){
+  G.exp+=amount;
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  if(G.exp>=need){ G.exp-=need; G.lv++; updateStageLocks(); showLU(); }
+  updateHeader();
+}
+
+function showLU(){
+  const t=getTitle();
+  document.getElementById('luLv').textContent='Lv.'+G.lv;
+  document.getElementById('luTitle').textContent=`称号：${t.icon} ${t.name}`;
+  document.getElementById('luOverlay').classList.add('show');
+}
+function closeLu(){ document.getElementById('luOverlay').classList.remove('show'); }
+function getTitle(){ let t=TITLES[0]; for(const tt of TITLES) if(G.lv>=tt.lv) t=tt; return t; }
+
+function updateHeader(){
+  const t=getTitle();
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  const pct=Math.min(G.exp/need*100,100);
+  document.getElementById('expFill').style.width=pct+'%';
+  document.getElementById('hExpLabel').textContent=`EXP ${G.exp}/${need}`;
+  document.getElementById('hTitleLabel').textContent=t.name;
+  document.getElementById('scoreBadge').textContent='💎 '+G.score+'pt';
+  document.getElementById('streakBadge').textContent='🔥 '+G.streak+'日';
+  const av=AVATARS[Math.min(G.lv-1,AVATARS.length-1)];
+  document.getElementById('heroAvatar').textContent=av;
+  document.getElementById('heroLv').textContent=G.lv;
+  document.getElementById('heroTitleBadge').textContent=t.icon+' '+t.name;
+  document.getElementById('todayQNum').textContent=G.todayQ;
+  document.getElementById('todayAccNum').textContent=G.todayQ>0?Math.round(G.todayOk/G.todayQ*100)+'%':'－';
+  document.getElementById('todayRoundsNum').textContent=G.todayRounds;
+}
+
+function updateMissions(){
+  const q=Math.min(G.todayQ,30);
+  document.getElementById('mc1bar').style.width=(q/30*100)+'%';
+  document.getElementById('mc1sub').textContent=`${G.todayQ} / 30 問`;
+  if(G.todayQ>=30){document.getElementById('mc1check').textContent='✅';document.getElementById('mc1').classList.add('done');}
+  const acc=G.todayQ>0?Math.round(G.todayOk/G.todayQ*100):0;
+  document.getElementById('mc2bar').style.width=Math.min(acc,100)+'%';
+  document.getElementById('mc2sub').textContent=`正解率 ${acc}%`;
+  if(acc>=80&&G.todayQ>=10){document.getElementById('mc2check').textContent='✅';document.getElementById('mc2').classList.add('done');}
+  const r=Math.min(G.todayRounds,2);
+  document.getElementById('mc3bar').style.width=(r/2*100)+'%';
+  document.getElementById('mc3sub').textContent=`${G.todayRounds} / 2 周`;
+  if(G.todayRounds>=2){document.getElementById('mc3check').textContent='✅';document.getElementById('mc3').classList.add('done');}
+}
+
+function updateWordDots(){
+  const grid=document.getElementById('wordDots');
+  if(!grid)return;
+  grid.innerHTML=WORDS.map((w,i)=>{
+    const wd=G.words[i];
+    const cls=wd.stageReached>=4?'mastered':wd.stageReached===3?'st3':wd.stageReached===2?'st2':wd.stageReached>=1?'st1':'';
+    const acc=wd.attempts>0?Math.round(wd.correct/wd.attempts*100):0;
+    return `<div class="word-dot ${cls}" title="${w.en}: ${w.ja}">${acc>0?acc+'%':''}</div>`;
+  }).join('');
+}
+
+function renderWordTable(){
+  const stL=['未','ST1','ST2','ST3','✨'];
+  const stC=['s0','s1','s2','s3','sm'];
+  document.getElementById('wordTableBody').innerHTML=WORDS.map((w,i)=>{
+    const wd=G.words[i];
+    const acc=wd.attempts>0?Math.round(wd.correct/wd.attempts*100)+'%':'－';
+    const st=Math.min(wd.stageReached,4);
+    return `<tr><td class="wt-en">${w.en}</td><td>${w.ja}</td><td><span class="wt-stage ${stC[st]}">${stL[st]}</span></td><td class="wt-acc">${acc}</td></tr>`;
+  }).join('');
+}
+
+function renderStatus(){
+  const t=getTitle();
+  const need=EXP_PER_LV[Math.min(G.lv-1,EXP_PER_LV.length-1)];
+  const pct=Math.min(G.exp/need*100,100);
+  document.getElementById('stAvatar').textContent=AVATARS[Math.min(G.lv-1,AVATARS.length-1)];
+  document.getElementById('stLv').textContent=G.lv;
+  document.getElementById('stTitle').textContent=t.icon+' '+t.name;
+  document.getElementById('stExpFill').style.width=pct+'%';
+  document.getElementById('stExpLabel').textContent=`EXP: ${G.exp} / ${need}`;
+  document.getElementById('stScore').textContent=G.score;
+  document.getElementById('stTotal').textContent=G.totalQ;
+  document.getElementById('stCorrect').textContent=G.totalOk;
+  document.getElementById('stRounds').textContent=G.totalRounds;
+  document.getElementById('titleRows').innerHTML=TITLES.map(tt=>`
+    <div class="title-row ${G.lv>=tt.lv?'unlocked':'locked'}">
+      <div class="tr-icon">${tt.icon}</div>
+      <div class="tr-body"><div class="tr-name">${tt.name}</div><div class="tr-cond">${tt.cond}</div></div>
+      <div class="tr-badge ${G.lv>=tt.lv?'u':'l'}">${G.lv>=tt.lv?'獲得済み':'未解放'}</div>
+    </div>`).join('');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+const SAVE_KEY = 'wordquest_grade1_v1';
+
+function saveGame(){
+  try {
+    const data = {
+      lv:G.lv, exp:G.exp, score:G.score,
+      totalQ:G.totalQ, totalOk:G.totalOk,
+      streak:G.streak, totalRounds:G.totalRounds,
+      todayQ:G.todayQ, todayOk:G.todayOk, todayRounds:G.todayRounds,
+      selectedStage:G.selectedStage,
+      words:G.words,
+      savedDate:new Date().toDateString()
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  } catch(e){ console.log('Save failed',e); }
+}
+
+function loadGame(){
+  try {
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw) return;
+    const data=JSON.parse(raw);
+    const isNewDay=data.savedDate!==new Date().toDateString();
+    G.lv=data.lv||1;
+    G.exp=data.exp||0;
+    G.score=data.score||0;
+    G.totalQ=data.totalQ||0;
+    G.totalOk=data.totalOk||0;
+    G.streak=data.streak||1;
+    G.totalRounds=data.totalRounds||0;
+    G.todayQ=isNewDay?0:(data.todayQ||0);
+    G.todayOk=isNewDay?0:(data.todayOk||0);
+    G.todayRounds=isNewDay?0:(data.todayRounds||0);
+    G.selectedStage=data.selectedStage||0;
+    if(data.words && data.words.length===WORDS.length) G.words=data.words;
+    if(isNewDay && data.savedDate){
+      G.streak=(data.streak||0)+1;
+      setTimeout(()=>showToast('🔥 '+G.streak+'日連続ログイン！'),500);
+    }
+  } catch(e){ console.log('Load failed',e); }
+}
+
+loadGame();
+updateHeader(); updateMissions(); updateWordDots(); updateStageLocks();
+</script>
+</body>
+</html>

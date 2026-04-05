@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quest ✨ 学年選択</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e1628;
+  --panel: #162040;
+  --panel2: #1e2d55;
+  --border: #2a3f7a;
+  --gold: #ffd166;
+  --gold2: #f4a261;
+  --blue: #4cc9f0;
+  --green: #06d6a0;
+  --red: #ef476f;
+  --text: #e8edf8;
+  --muted: #6b7db3;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(76,201,240,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(244,162,97,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(123,45,139,0.05) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+.stars-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: var(--o); } to { opacity: calc(var(--o)*0.1); } }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes pop { from{transform:scale(0.8) translateY(20px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+@keyframes shimmer { 0%,100%{opacity:0.7} 50%{opacity:1} }
+
+.wrap {
+  position: relative; z-index: 1;
+  width: 100%; max-width: 500px;
+  padding: 40px 20px 60px;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.hero-icon {
+  font-size: 4.5rem;
+  display: block;
+  margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255,209,102,0.6));
+}
+.hero-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.4rem;
+  color: var(--gold);
+  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(255,209,102,0.4);
+  margin-bottom: 8px;
+}
+.hero-title em { color: var(--blue); font-style: normal; }
+.hero-sub {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.hero-sub strong { color: var(--text); }
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.grade-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.grade-card {
+  display: block;
+  text-decoration: none;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 22px 20px;
+  transition: all .25s cubic-bezier(.22,1,.36,1);
+  animation: pop .5s cubic-bezier(.22,1,.36,1) both;
+  position: relative;
+  overflow: hidden;
+}
+.grade-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity .25s;
+}
+.grade-card:hover { transform: translateY(-4px); }
+
+.grade-card.g1 { animation-delay: .1s; }
+.grade-card.g2 { animation-delay: .2s; }
+.grade-card.g3 { animation-delay: .3s; }
+
+.grade-card.g1 { border-color: rgba(76,201,240,0.3); }
+.grade-card.g1::before { background: radial-gradient(ellipse at 80% 50%, rgba(76,201,240,0.08), transparent); }
+.grade-card.g1:hover { border-color: var(--blue); box-shadow: 0 8px 32px rgba(76,201,240,0.2); }
+.grade-card.g1:hover::before { opacity: 1; }
+
+.grade-card.g2 { border-color: rgba(6,214,160,0.3); }
+.grade-card.g2::before { background: radial-gradient(ellipse at 80% 50%, rgba(6,214,160,0.08), transparent); }
+.grade-card.g2:hover { border-color: var(--green); box-shadow: 0 8px 32px rgba(6,214,160,0.2); }
+.grade-card.g2:hover::before { opacity: 1; }
+
+.grade-card.g3 { border-color: rgba(244,162,97,0.3); }
+.grade-card.g3::before { background: radial-gradient(ellipse at 80% 50%, rgba(244,162,97,0.08), transparent); }
+.grade-card.g3:hover { border-color: var(--gold2); box-shadow: 0 8px 32px rgba(244,162,97,0.2); }
+.grade-card.g3:hover::before { opacity: 1; }
+
+.gc-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative; z-index: 1;
+}
+.gc-icon {
+  font-size: 2.8rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));
+}
+.gc-body { flex: 1; }
+.gc-grade {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.g1 .gc-grade { color: var(--blue); }
+.g2 .gc-grade { color: var(--green); }
+.g3 .gc-grade { color: var(--gold2); }
+
+.gc-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.gc-desc {
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.gc-arrow {
+  font-size: 1.4rem;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform .2s, color .2s;
+}
+.grade-card:hover .gc-arrow {
+  transform: translateX(4px);
+}
+.g1:hover .gc-arrow { color: var(--blue); }
+.g2:hover .gc-arrow { color: var(--green); }
+.g3:hover .gc-arrow { color: var(--gold2); }
+
+.gc-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.gc-tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.g1 .gc-tag { background: rgba(76,201,240,0.08); border-color: rgba(76,201,240,0.2); color: var(--blue); }
+.g2 .gc-tag { background: rgba(6,214,160,0.08); border-color: rgba(6,214,160,0.2); color: var(--green); }
+.g3 .gc-tag { background: rgba(244,162,97,0.08); border-color: rgba(244,162,97,0.2); color: var(--gold2); }
+
+.gc-progress {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.gc-progress-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--panel2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.gc-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .6s;
+}
+.g1 .gc-progress-fill { background: var(--blue); }
+.g2 .gc-progress-fill { background: var(--green); }
+.g3 .gc-progress-fill { background: var(--gold2); }
+.gc-progress-label {
+  font-size: 0.65rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.info-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  animation: pop .5s .4s cubic-bezier(.22,1,.36,1) both;
+}
+.info-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+.info-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.info-item-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.info-item-text { color: var(--muted); }
+.info-item-text strong { color: var(--text); }
+
+.footer {
+  text-align: center;
+  margin-top: 32px;
+  font-size: 0.68rem;
+  color: var(--muted);
+  animation: pop .5s .5s cubic-bezier(.22,1,.36,1) both;
+}
+</style>
+</head>
+<body>
+<div class="stars-bg" id="starsBg"></div>
+<div class="wrap">
+
+  <div class="hero-section">
+    <span class="hero-icon">✨</span>
+    <div class="hero-title">Word<em>Quest</em></div>
+    <div class="hero-sub">
+      <strong>高校入試対策</strong>英単語学習アプリ<br>
+      学年を選んで冒険を始めよう！
+    </div>
+  </div>
+
+  <div class="section-label">🏫 学年を選択</div>
+
+  <div class="grade-cards">
+    <a href="grade1.html" class="grade-card g1" id="card1">
+      <div class="gc-inner">
+        <div class="gc-icon">🌱</div>
+        <div class="gc-body">
+          <div class="gc-grade">Grade 1 · 中学1年生</div>
+          <div class="gc-title">基礎の冒険</div>
+          <div class="gc-desc">基本動詞・名詞・形容詞を中心に<br>高校入試頻出の中1単語をマスター</div>
+          <div class="gc-tags">
+            <span class="gc-tag">📚 180語収録</span>
+            <span class="gc-tag">⚔️ 3ステージ</span>
+            <span class="gc-tag">🎯 30問/周</span>
+          </div>
+          <div class="gc-progress">
+            <div class="gc-progress-bar"><div class="gc-progress-fill" id="prog1" style="width:0%"></div></div>
+            <div class="gc-progress-label" id="progLabel1">未プレイ</div>
+          </div>
+        </div>
+        <div class="gc-arrow">▶</div>
+      </div>
+    </a>
+
+    <a href="grade2.html" class="grade-card g2" id="card2">
+      <div class="gc-inner">
+        <div class="gc-icon">⚔️</div>
+        <div class="gc-body">
+          <div class="gc-grade">Grade 2 · 中学2年生</div>
+          <div class="gc-title">成長の冒険</div>
+          <div class="gc-desc">比較・受動態・不定詞など<br>中2で習う重要単語を完全制覇</div>
+          <div class="gc-tags">
+            <span class="gc-tag">📚 200語収録</span>
+            <span class="gc-tag">⚔️ 3ステージ</span>
+            <span class="gc-tag">🎯 30問/周</span>
+          </div>
+          <div class="gc-progress">
+            <div class="gc-progress-bar"><div class="gc-progress-fill" id="prog2" style="width:0%"></div></div>
+            <div class="gc-progress-label" id="progLabel2">未プレイ</div>
+          </div>
+        </div>
+        <div class="gc-arrow">▶</div>
+      </div>
+    </a>
+
+    <a href="grade3.html" class="grade-card g3" id="card3">
+      <div class="gc-inner">
+        <div class="gc-icon">🔮</div>
+        <div class="gc-body">
+          <div class="gc-grade">Grade 3 · 中学3年生</div>
+          <div class="gc-title">決戦の冒険</div>
+          <div class="gc-desc">現在完了・関係代名詞など<br>入試最重要単語で合格を掴め</div>
+          <div class="gc-tags">
+            <span class="gc-tag">📚 220語収録</span>
+            <span class="gc-tag">⚔️ 3ステージ</span>
+            <span class="gc-tag">🎯 30問/周</span>
+          </div>
+          <div class="gc-progress">
+            <div class="gc-progress-bar"><div class="gc-progress-fill" id="prog3" style="width:0%"></div></div>
+            <div class="gc-progress-label" id="progLabel3">未プレイ</div>
+          </div>
+        </div>
+        <div class="gc-arrow">▶</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">💡 使い方</div>
+    <div class="info-items">
+      <div class="info-item">
+        <div class="info-item-icon">⚔️</div>
+        <div class="info-item-text"><strong>3つのステージ</strong>で段階的に学習。Stage1（4択）→ Stage2（スペル）→ Stage3（英作文）</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🔀</div>
+        <div class="info-item-text">毎回<strong>30問ランダム出題</strong>。周回するたびに違う単語が出て飽きない</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">🔥</div>
+        <div class="info-item-text">間違えた単語は<strong>その場で再出題</strong>。弱点を自動的に強化</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">📊</div>
+        <div class="info-item-text">各学年の<strong>進捗は独立して保存</strong>。3学年すべて並行して使えます</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Word Quest · 高校入試対策英単語アプリ<br>
+    各学年の進捗はブラウザに自動保存されます
+  </div>
+</div>
+
+<script>
+// Stars
+(function(){
+  const c=document.getElementById('starsBg');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2.5+0.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;--o:${0.1+Math.random()*0.6};animation-delay:${Math.random()*5}s`;
+    c.appendChild(s);
+  }
+})();
+
+// 各学年の進捗を表示
+function loadProgress(saveKey, progId, labelId) {
+  try {
+    const raw = localStorage.getItem(saveKey);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    const total = data.totalQ || 0;
+    const ok = data.totalOk || 0;
+    const rounds = data.totalRounds || 0;
+    const lv = data.lv || 1;
+    if (total > 0) {
+      const acc = Math.round(ok / total * 100);
+      const pct = Math.min(lv / 20 * 100, 100);
+      document.getElementById(progId).style.width = pct + '%';
+      document.getElementById(labelId).textContent = `Lv.${lv} · ${rounds}周 · 正解率${acc}%`;
+    }
+  } catch(e) {}
+}
+
+loadProgress('wordquest_grade1_v1', 'prog1', 'progLabel1');
+loadProgress('wordquest_grade2_v1', 'prog2', 'progLabel2');
+loadProgress('wordquest_grade3_v1', 'prog3', 'progLabel3');
+</script>
+</body>
+</html>
